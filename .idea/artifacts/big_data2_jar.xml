@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="big_data2:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/big_data2_jar</output-path>
+    <root id="archive" name="big_data.jar">
+      <element id="module-output" name="big_data" />
+    </root>
+  </artifact>
+</component>
