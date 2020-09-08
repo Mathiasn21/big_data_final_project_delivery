@@ -17,7 +17,6 @@ val file = Files.TvShows
 val path = DataFiles.getFilePath(file)
 val format = DataFiles.getFileType(file)
 
-//VIKTIGSTE :')
 var df = spark.read.format(format)
   .option("delimiter", ",")
   .option("header", value = true)
