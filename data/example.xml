@@ -1,0 +1,17 @@
+<People>
+
+   <Student Id="123432">
+      <FirstName>Ole</FirstName>
+      <LastName>Dal</LastName>
+   </Student>
+
+   <Student Id="54321">
+      <FirstName>Mona</FirstName>
+      <LastName>Laurindaughter</LastName>
+   </Student>
+
+   <Employee Id="765">
+      <FirstName>Marius</FirstName>
+      <LastName>Geitle</LastName>
+   </Employee>
+</People>
