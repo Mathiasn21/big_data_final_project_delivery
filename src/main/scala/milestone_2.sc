@@ -13,6 +13,7 @@ val spark = SparkSession.builder
   .getOrCreate()
 print("\n\n\n")
 
+
 val file = Files.TvShows
 val path = DataFiles.getFilePath(file)
 val format = DataFiles.getFileType(file)
@@ -26,24 +27,32 @@ var df = spark.read.format(format)
 
 def query_1(df: sql.DataFrame): Unit ={
   //TODO: Find average num of shows pr year.
-  val sortedCountByYear = df.groupBy("Year")
+
+  print("PLAN FOR mean pr år: \n")
+  df.groupBy("Year")
     .count()
     .sort("Year")
-
-  val avgByYear = sortedCountByYear
     .agg(avg("count").as("Avg_year"))
-  val medianType = sortedCountByYear
-    .stat.approxQuantile("count", Array(0.5), 0.10)
+    .explain(true)
 
-  sortedCountByYear.show()
-  avgByYear.show()
-  print("\n\nMedian: " + medianType.mkString(", "))
+  print("\n\n\n")
+
+/*  val medianType = df.groupBy("Year")
+    .count()
+    .sort("Year")
+    .stat.approxQuantile("count", Array(0.5), 0.10)
+*/
+
+  df.groupBy("Year")
+    .count()
+    .sort("Year").explain(true)
 }
 
 def query_2(df : sql.DataFrame): Unit ={
   //TODO: Find 5s year has the highest rating shows pr year
+  print("\n\n\nQuery for flest shows med høyest rating")
   df.filter("IMDb is not null").groupBy("Year")
-    .sum("IMDb").sort(column("sum(IMDb)").desc).show(5)
+    .sum("IMDb").sort(column("sum(IMDb)").desc).explain(true)
 
   val summedDf = df.agg(
     sum("Hulu").as("Hulu_sum"),
@@ -51,14 +60,18 @@ def query_2(df : sql.DataFrame): Unit ={
     sum("Netflix").as("Netflix_sum"),
     sum("Prime Video").as("Prime_Vid_sum")
   )
-  summedDf.show()
+  summedDf.explain(true)
+  print("\n\n\n\n\n")
 
   val structs = summedDf.columns.tail.map(
     c => struct(col(c).as("v"), lit(c).as("k"))
   )
 
+  print("max and min:\n")
   summedDf.withColumn("maxCol", greatest(structs: _*).getItem("k"))
-    .withColumn("minCol", least(structs: _*).getItem("k")).show()
-
+    .withColumn("minCol", least(structs: _*).getItem("k")).explain(true)
   print("\n")
 }
+query_1(df)
+query_2(df)
+
