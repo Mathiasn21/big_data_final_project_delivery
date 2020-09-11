@@ -1,5 +1,5 @@
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.{SaveMode, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.{col, regexp_replace}
 
 object SparkApplicationTest extends App {
@@ -10,7 +10,6 @@ object SparkApplicationTest extends App {
     .appName("Testing App")
     .getOrCreate()
   print("\n\n\n")
-
   val file = Files.Movies
   val path = DataFiles.getFilePath(file)
   val format = DataFiles.getFileType(file)

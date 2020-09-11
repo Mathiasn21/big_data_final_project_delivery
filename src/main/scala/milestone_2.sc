@@ -1,7 +1,7 @@
 import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.{avg, col, column, greatest, least, lit, struct, sum}
-
+import org.apache.spark.sql.functions._
 
 
 Logger.getLogger("org").setLevel(Level.WARN)
@@ -12,6 +12,7 @@ val spark = SparkSession.builder
   .appName("Testing App")
   .getOrCreate()
 print("\n\n\n")
+
 
 val file = Files.TvShows
 val path = DataFiles.getFilePath(file)
@@ -24,48 +25,53 @@ var df = spark.read.format(format)
   .load(path)
   .drop("type")
 
-// df.where("Year > 2010").sort(column("IMDb").desc_nulls_last).show(1000, truncate = false)
-//TODO: Find average and median of num of shows pr year.
-val sortedCountByYear = df.groupBy("Year")
-  .count()
-  .sort("Year")
+def query_1(df: sql.DataFrame): Unit ={
+  //TODO: Find average num of shows pr year.
 
-val avgByYear = sortedCountByYear
-  .agg(avg("count").as("Avg_year"))
-val medianType = sortedCountByYear
-  .stat.approxQuantile("count", Array(0.5), 0.10)
+  print("PLAN FOR mean pr år: \n")
+  df.groupBy("Year")
+    .count()
+    .sort("Year")
+    .agg(avg("count").as("Avg_year"))
+    .explain(true)
 
-sortedCountByYear.show()
-avgByYear.show()
-print("\n\n" + medianType.mkString(", "))
+  print("\n\n\n")
 
-
-
-//TODO: Find which year has the highest rating shows pr year
-df.filter("IMDb is not null").groupBy("Year")
-  .sum("IMDb").sort(column("sum(IMDb)").desc).show(5)
-
-
-/*
-df.select(
-  when( (col("armed") === "gun") && ($"race" === $"Black"), "Yes" )
-    .otherwise("No")
-).show()
+/*  val medianType = df.groupBy("Year")
+    .count()
+    .sort("Year")
+    .stat.approxQuantile("count", Array(0.5), 0.10)
 */
 
-val summedDf = df.agg(
-  sum("Hulu").as("Hulu_sum"),
-  sum("Disney+").as("Disney_sum"),
-  sum("Netflix").as("Netflix_sum"),
-  sum("Prime Video").as("Prime_Vid_sum")
-)
-summedDf.show()
+  df.groupBy("Year")
+    .count()
+    .sort("Year").explain(true)
+}
 
-val structs = summedDf.columns.tail.map(
-  c => struct(col(c).as("v"), lit(c).as("k"))
-)
+def query_2(df : sql.DataFrame): Unit ={
+  //TODO: Find 5s year has the highest rating shows pr year
+  print("\n\n\nQuery for flest shows med høyest rating")
+  df.filter("IMDb is not null").groupBy("Year")
+    .sum("IMDb").sort(column("sum(IMDb)").desc).explain(true)
 
-summedDf.withColumn("maxCol", greatest(structs: _*).getItem("k"))
-  .withColumn("minCol", least(structs: _*).getItem("k")).show()
+  val summedDf = df.agg(
+    sum("Hulu").as("Hulu_sum"),
+    sum("Disney+").as("Disney_sum"),
+    sum("Netflix").as("Netflix_sum"),
+    sum("Prime Video").as("Prime_Vid_sum")
+  )
+  summedDf.explain(true)
+  print("\n\n\n\n\n")
 
-print("\n")
+  val structs = summedDf.columns.tail.map(
+    c => struct(col(c).as("v"), lit(c).as("k"))
+  )
+
+  print("max and min:\n")
+  summedDf.withColumn("maxCol", greatest(structs: _*).getItem("k"))
+    .withColumn("minCol", least(structs: _*).getItem("k")).explain(true)
+  print("\n")
+}
+query_1(df)
+query_2(df)
+
