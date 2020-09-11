@@ -27,7 +27,7 @@ var df = spark.read.format(format)
 
 df.write.mode(SaveMode.Overwrite).format("csv").save("D:\\data\\testing")
 print(df.columns.mkString(", "))
-df.where("Year > 2010").sort(column("IMDb").desc_nulls_last).show(1000, truncate = false)
+df.where(col("Year") > 2010).sort(column("IMDb").desc_nulls_last).show(1000, truncate = false)
 df.select("Age").distinct().show()
 
 df.withColumn("l_c0", col("_c0").cast("long")).show()
