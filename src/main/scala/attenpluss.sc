@@ -47,5 +47,5 @@ val df_max = List(
 
 val maks_all= df_max.filter($"show".like("%all%")).sort(col("count").desc).take(1)
 
-val maks_attenatten = df_max.filter($"show".like("%18%")).sort(col("count").desc).take(1)*/
+val maks_atten = df_max.filter($"show".like("%18%")).sort(col("count").desc).take(1)*/
 
