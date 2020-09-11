@@ -1,6 +1,6 @@
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.{col, greatest, least, lit, struct, sum}
+import org.apache.spark.sql.functions.{avg, col, column, greatest, least, lit, struct, sum}
 
 
 
@@ -26,7 +26,7 @@ var df = spark.read.format(format)
 
 // df.where("Year > 2010").sort(column("IMDb").desc_nulls_last).show(1000, truncate = false)
 //TODO: Find average and median of num of shows pr year.
-/*val sortedCountByYear = df.groupBy("Year")
+val sortedCountByYear = df.groupBy("Year")
   .count()
   .sort("Year")
 
@@ -45,7 +45,6 @@ print("\n\n" + medianType.mkString(", "))
 df.filter("IMDb is not null").groupBy("Year")
   .sum("IMDb").sort(column("sum(IMDb)").desc).show(5)
 
-*/
 
 /*
 df.select(
@@ -55,16 +54,17 @@ df.select(
 */
 
 val summedDf = df.agg(
-sum("Hulu").as("Hulu_sum"),
-sum("Disney+").as("Disney_sum"),
-sum("Netflix").as("Netflix_sum"),
-sum("Prime Video").as("Prime_Vid_sum")
+  sum("Hulu").as("Hulu_sum"),
+  sum("Disney+").as("Disney_sum"),
+  sum("Netflix").as("Netflix_sum"),
+  sum("Prime Video").as("Prime_Vid_sum")
 )
 summedDf.show()
 
 val structs = summedDf.columns.tail.map(
   c => struct(col(c).as("v"), lit(c).as("k"))
 )
+
 summedDf.withColumn("maxCol", greatest(structs: _*).getItem("k"))
   .withColumn("minCol", least(structs: _*).getItem("k")).show()
 
