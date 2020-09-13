@@ -22,15 +22,14 @@ val df = spark.read.format("csv")
 
 val myDf = df.select("Title", "IMDb", "Netflix", "Hulu", "Prime Video", "Disney+").sort(desc("IMDb")).limit(10)
 
-val str = myDf.columns.tail.map(
-  c => struct(col(c).as("c"), lit(c).as("k"))
+val result = myDf.withColumn("newCol",
+  concat_ws(", ",
+    when(col("Hulu") === 1, lit("Hulu")),
+    when(col("Prime Video") === 1, lit("Prime Video")),
+    when(col("Disney+") === 1, lit("Disney+")),
+    when(col("Netflix") === 1, lit("Netflix"))
+  )
 )
-val columns = Array("Hulu", "Prime Video")
-val result = myDf.withColumn("newCol", split(concat_ws(";",  columns.map(c=> {
-  val value = col(c)
-  value
-})
-: _*), ";"))
 
 result.show()
 /*myDf.select(col("Title"), col("IMDb"),
