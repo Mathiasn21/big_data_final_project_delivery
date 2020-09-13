@@ -58,7 +58,7 @@ def query_2(df : DataFrame): Unit = {
 }
 
 def query_3(df: DataFrame): Unit = {
-  //TODO: Find 5s year has the highest rating shows pr year
+  //TODO: Find year has the highest rating shows pr year
   print("\n\n\nQuery for flest shows med høyest rating")
   df.filter("IMDb is not null").groupBy("Year")
     .sum("IMDb").sort(column("sum(IMDb)").desc).explain(true)
