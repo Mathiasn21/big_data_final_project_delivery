@@ -49,6 +49,7 @@ def query_2(df : DataFrame): Unit = {
   val structs = summedDf.columns.tail.map(
     c => struct(col(c).as("v"), lit(c).as("k"))
   )
+
   print("\n\n\n\n\n")
   print("max and min:\n")
   summedDf.withColumn("maxCol", greatest(structs: _*).getItem("k"))
@@ -63,6 +64,8 @@ def query_3(df: DataFrame): Unit = {
     .sum("IMDb").sort(column("sum(IMDb)").desc).explain(true)
 
 }
+
+
 
 query_1(df)
 query_2(df)
