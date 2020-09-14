@@ -30,8 +30,7 @@ val result = myDf.withColumn("newCol",
     when(col("Netflix") === 1, lit("Netflix"))
   )
 )
-
-result.show()
+result.explain(true)
 /*myDf.select(col("Title"), col("IMDb"),
   when(col("Prime Video")  ===1, "Prime Video")
     .when(col("Netflix") === 1, "Netflix")
