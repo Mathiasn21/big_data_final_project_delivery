@@ -60,8 +60,9 @@ def query_2(df : DataFrame): Unit = {
 def query_3(df: DataFrame): Unit = {
   //TODO: Find year has the highest rating shows pr year
   print("\n\n\nQuery for flest shows med høyest rating")
-  df.filter("IMDb is not null").groupBy("Year")
-    .sum("IMDb").sort(column("sum(IMDb)").desc).explain(true)
+  val res = df.filter("IMDb is not null").groupBy("Year")
+    .avg("IMDb").sort(column("sum(IMDb)").desc)
+    res.explain(true)
 }
 
 /*def query_3(df: DataFrame): Unit = {

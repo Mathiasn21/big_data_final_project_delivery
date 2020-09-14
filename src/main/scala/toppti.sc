@@ -20,16 +20,19 @@ val df = spark.read.format("csv")
   .option("inferSchema", "true")
   .load("D:\\projects_git\\Semester5\\big_data\\data\\tv_shows.csv")
 
-val myDf = df.select("Title", "IMDb", "Netflix", "Hulu", "Prime Video", "Disney+").sort(desc("IMDb")).limit(10)
-
-val result = myDf.withColumn("newCol",
-  concat_ws(", ",
-    when(col("Hulu") === 1, lit("Hulu")),
-    when(col("Prime Video") === 1, lit("Prime Video")),
-    when(col("Disney+") === 1, lit("Disney+")),
-    when(col("Netflix") === 1, lit("Netflix"))
-  )
-)
+val result = df
+  .select("Title", "IMDb", "Netflix", "Hulu", "Prime Video", "Disney+")
+  .sort(desc("IMDb"))
+  .limit(10)
+  .withColumn("Topp10",
+    concat_ws(", ",
+      when(col("Hulu") === 1, lit("Hulu")),
+      when(col("Prime Video") === 1, lit("Prime Video")),
+      when(col("Disney+") === 1, lit("Disney+")),
+      when(col("Netflix") === 1, lit("Netflix"))
+    )
+  ).drop("Netflix", "Hulu", "Prime Video", "Disney+")
+result.show(false)
 result.explain(true)
 /*myDf.select(col("Title"), col("IMDb"),
   when(col("Prime Video")  ===1, "Prime Video")
