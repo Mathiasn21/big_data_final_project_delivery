@@ -14,7 +14,7 @@ val spark = SparkSession.builder
 print("\n\n\n")
 
 
-val file = Files.TvShows
+val file = Files.Kickstarter
 val path = DataFiles.getFilePath(file)
 val format = DataFiles.getFileType(file)
 
@@ -23,4 +23,6 @@ var df = spark.read.format(format)
   .option("header", value = true)
   .option("inferSchema", value = true)
   .load(path)
-  .drop("type")
+
+df.printSchema()
+df.groupBy(col("country ")).count().show()
