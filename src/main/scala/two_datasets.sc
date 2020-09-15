@@ -41,8 +41,3 @@ val kickDf = spark.read.format("csv")
   .equalTo(dateKick("Year_kick")))
   .groupBy("Year", "Title").count().groupBy("Year").count().
   agg(sum("count")).show()*/
-
-
-
-
-
