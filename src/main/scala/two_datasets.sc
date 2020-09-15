@@ -13,14 +13,36 @@ val spark = SparkSession.builder
   .getOrCreate()
 print("\n\n\n")
 
-
-val file = Files.TvShows
-val path = DataFiles.getFilePath(file)
-val format = DataFiles.getFileType(file)
-
-var df = spark.read.format(format)
-  .option("delimiter", ",")
+val tvDf = spark.read.format("csv")
   .option("header", value = true)
-  .option("inferSchema", value = true)
-  .load(path)
-  .drop("type")
+  .option("inferSchema", "true")
+  .load("C:\\Users\\marpe\\Documents\\bigdata\\data\\tv-shows.csv")
+  .drop("_c0", "Age", "IMDb", "type", "Netflix",
+    "Rotten Tomatoes", "Hulu", "Prime Video", "Disney+")
+  .groupBy("Year").count().as("tv_count")
+
+val kickDf = spark.read.format("csv")
+  .option("header", value = true)
+  .option("inferSchema", "true")
+  .load("C:\\Users\\marpe\\Documents\\kickstarter.csv")
+  .drop("currency ", "category ", "main_category ", "backers ",
+    "goal ", "deadline ", "pledged ", "state ", "country ", "usd pledged ",
+    "_c14", "_c15", "_c16", "_c13")
+
+
+ val dateKick = kickDf.withColumn("date_time",
+    unix_timestamp(kickDf("launched "), "yyyy-MM-dd HH:mm:ss").cast("timestamp"))
+   .withColumn("Year_kick", year(col("date_time")))
+   .groupBy("Year_kick").count().as("kickstarter_count")
+
+
+
+/*val kickTv = tvDf.join(dateKick, tvDf.col("Year")
+  .equalTo(dateKick("Year_kick")))
+  .groupBy("Year", "Title").count().groupBy("Year").count().
+  agg(sum("count")).show()*/
+
+
+
+
+
