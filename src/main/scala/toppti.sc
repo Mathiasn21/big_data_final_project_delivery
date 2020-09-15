@@ -33,6 +33,8 @@ val result = df
     )
   ).drop("Netflix", "Hulu", "Prime Video", "Disney+")
 
-result.write.mode(SaveMode.Overwrite).format("csv").save("C:\\Users\\marpe\\Documents\\bigdata\\skriv_til")
+result.explain(true)
+
+//result.write.mode(SaveMode.Overwrite).format("csv").save("C:\\Users\\marpe\\Documents\\bigdata\\skriv_til")
 
 
