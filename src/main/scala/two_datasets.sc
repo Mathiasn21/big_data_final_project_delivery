@@ -19,7 +19,8 @@ val tvDf = spark.read.format("csv")
   .load("C:\\Users\\marpe\\Documents\\bigdata\\data\\tv-shows.csv")
   .drop("_c0", "Age", "IMDb", "type", "Netflix",
     "Rotten Tomatoes", "Hulu", "Prime Video", "Disney+")
-  .groupBy("Year").count().as("tv_count")
+  .groupBy("Year")
+  .count().withColumnRenamed("count", "tv_count")
 
 val kickDf = spark.read.format("csv")
   .option("header", value = true)
@@ -33,11 +34,10 @@ val kickDf = spark.read.format("csv")
  val dateKick = kickDf.withColumn("date_time",
     unix_timestamp(kickDf("launched "), "yyyy-MM-dd HH:mm:ss").cast("timestamp"))
    .withColumn("Year_kick", year(col("date_time")))
-   .groupBy("Year_kick").count().as("kickstarter_count")
+   .groupBy("Year_kick")
+   .count().withColumnRenamed("count", "kickstarter_count")
 
+val kickTv = tvDf.join(dateKick, tvDf.col("Year")
+  .equalTo(dateKick("Year_kick"))).drop("Year_kick")
 
-
-/*val kickTv = tvDf.join(dateKick, tvDf.col("Year")
-  .equalTo(dateKick("Year_kick")))
-  .groupBy("Year", "Title").count().groupBy("Year").count().
-  agg(sum("count")).show()*/
+kickTv.show()
