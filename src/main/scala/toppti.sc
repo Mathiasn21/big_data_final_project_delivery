@@ -18,11 +18,11 @@ val spark = SparkSession.builder
 val df = spark.read.format("csv")
   .option("header", value = true)
   .option("inferSchema", "true")
-  .load("D:\\projects_git\\Semester5\\big_data\\data\\tv_shows.csv")
+  .load("C:\\Users\\marpe\\Documents\\bigdata\\data\\tv_shows.csv")
 
 val myDf = df.select("Title", "IMDb", "Netflix", "Hulu", "Prime Video", "Disney+").sort(desc("IMDb")).limit(10)
 
-val result = myDf.withColumn("newCol",
+val result = myDf.withColumn("Streaming service",
   concat_ws(", ",
     when(col("Hulu") === 1, lit("Hulu")),
     when(col("Prime Video") === 1, lit("Prime Video")),
@@ -32,9 +32,3 @@ val result = myDf.withColumn("newCol",
 )
 
 result.show()
-/*myDf.select(col("Title"), col("IMDb"),
-  when(col("Prime Video")  ===1, "Prime Video")
-    .when(col("Netflix") === 1, "Netflix")
-    .when(col("Hulu") === 1, "Hulu")
-    .when(col("Disney+") === 1, "Disney+")
-    .alias("Streaming service")).show()*/
