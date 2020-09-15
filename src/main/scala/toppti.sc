@@ -18,7 +18,7 @@ val spark = SparkSession.builder
 val df = spark.read.format("csv")
   .option("header", value = true)
   .option("inferSchema", "true")
-  .load("C:\\Users\\marpe\\Documents\\bigdata\\data\\tv_shows.csv")
+  .load("C:\\Users\\marpe\\Documents\\bigdata\\data\\tv-shows.csv")
 
 val result = df
   .select("Title", "IMDb", "Netflix", "Hulu", "Prime Video", "Disney+")
@@ -32,11 +32,7 @@ val result = df
       when(col("Netflix") === 1, lit("Netflix"))
     )
   ).drop("Netflix", "Hulu", "Prime Video", "Disney+")
-result.show(false)
-result.explain(true)
-/*myDf.select(col("Title"), col("IMDb"),
-  when(col("Prime Video")  ===1, "Prime Video")
-    .when(col("Netflix") === 1, "Netflix")
-    .when(col("Hulu") === 1, "Hulu")
-    .when(col("Disney+") === 1, "Disney+")
-    .alias("Streaming service")).show()*/
+
+result.write.mode(SaveMode.Overwrite).format("csv").save("C:\\Users\\marpe\\Documents\\bigdata\\skriv_til")
+
+
