@@ -30,7 +30,6 @@ val kickDf = spark.read.format("csv")
     "goal ", "deadline ", "pledged ", "state ", "country ", "usd pledged ",
     "_c14", "_c15", "_c16", "_c13")
 
-
  val dateKick = kickDf.withColumn("date_time",
     unix_timestamp(kickDf("launched "), "yyyy-MM-dd HH:mm:ss").cast("timestamp"))
    .withColumn("Year_kick", year(col("date_time")))
