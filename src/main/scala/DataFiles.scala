@@ -1,7 +1,7 @@
 import scala.collection.immutable.HashMap
 
 object Files extends Enumeration {
-  val Shootings, IRIS_flowers, glass, Movies, TvShows, DatingProfiles1 = Value
+  val Shootings, IRIS_flowers, glass, Movies, TvShows, Kickstarter, DatingProfiles1 = Value
 }
 
 object Type extends Enumeration {
@@ -16,6 +16,7 @@ object DataFiles{
     Files.Shootings -> "shootings.csv",
     Files.Movies -> "movies.csv",
     Files.TvShows -> "tv_shows.csv",
+    Files.Kickstarter -> "ks-projects-201612.csv",
     Files.DatingProfiles1 -> "dating_profiles\\profiles_1_datingApp.csv"
   )
   val fileTypeHashMap: Map[Files.Value, Type.Value] = HashMap(
@@ -24,7 +25,8 @@ object DataFiles{
     Files.glass -> Type.CSV,
     Files.Movies -> Type.CSV,
     Files.TvShows -> Type.CSV,
-    Files.DatingProfiles1 -> Type.CSV
+    Files.DatingProfiles1 -> Type.CSV,
+    Files.Kickstarter -> Type.CSV
   )
 
   def getFilePath(file: Files.Value): String = dataLocation + fileHashMap(file)
