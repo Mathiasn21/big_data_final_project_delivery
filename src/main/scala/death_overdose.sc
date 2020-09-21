@@ -45,7 +45,7 @@ val str = "dada" + "dasdwad"
 val gunDeathByRace = gunDf.filter(predicate)
   .agg(
     countByRace(race_col, black, "Gun_death_Black_count"),
-    countByRace(race_col, white, "Gun_death_White_count"),
+    countByRace(race_col, white, "Gun_death_White_count")
   )
 
 
