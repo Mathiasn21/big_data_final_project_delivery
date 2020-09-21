@@ -39,4 +39,4 @@ val kickDf = spark.read.format("csv")
 val kickTv = tvDf.join(dateKick, tvDf.col("Year")
   .equalTo(dateKick("Year_kick"))).drop("Year_kick")
 
-kickTv.show()
+kickTv.explain(true)
