@@ -5,7 +5,6 @@ import org.apache.spark.sql.functions.{col, column}
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.sql.functions.{col, sum}
 import org.apache.spark.sql.functions._
-import spark.implicits
 
 Logger.getLogger("org").setLevel(Level.WARN)
 Logger.getLogger("akka").setLevel(Level.WARN)
