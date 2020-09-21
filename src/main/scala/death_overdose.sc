@@ -22,6 +22,9 @@ val df = spark.read
   .format("csv")
   .option("header", "true")
   .option("inferSchema", "true")
-  .load(guns_file)
+  .load(drug_file)
 
 df.show()
+
+val thing = df.filter(col("Race") === "White").count()
+print(thing)
