@@ -49,7 +49,6 @@ def query_2(df : DataFrame): Unit = {
 
   summedDf.withColumn("maxCol", greatest(structs: _*).getItem("k"))
     .withColumn("minCol", least(structs: _*).getItem("k")).show()
-
 }
 
 def query_3(df: DataFrame): Unit = {
