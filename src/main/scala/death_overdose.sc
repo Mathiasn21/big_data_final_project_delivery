@@ -32,6 +32,7 @@ val gunDf = loadDf(guns_file)
 val drugDf = loadDf(drug_file).filter(!col("_c0").contains("("))
 
 drugDf.show(false)
+gunDf.show(false)
 
 val white = "White"
 val black = "Black"
