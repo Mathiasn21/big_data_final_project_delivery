@@ -22,13 +22,16 @@ import spark.implicits._
 def loadDf(file: String): DataFrame = (spark.read format "csv")
   .option("header", "true")
   .option("inferSchema", "true")
+  .option("delimiter", ",")
   .load(file)
 
 val guns_file = "D:\\data\\guns.csv"
 val drug_file = "D:\\data\\drug_deaths.csv"
 
 val gunDf = loadDf(guns_file)
-val drugDf = loadDf(drug_file)
+val drugDf = loadDf(drug_file).filter(!col("_c0").contains("("))
+
+drugDf.show(false)
 
 val white = "White"
 val black = "Black"
@@ -50,6 +53,4 @@ val gunDeathByRace = gunDf.filter(predicate)
     countByRace(race_col, white, "Gun_death_White_count")
   )
 
-print("This is the reason peopleee dies :'( ")
-overdoseByRace.join(gunDeathByRace).show()
 overdoseByRace.join(gunDeathByRace).explain(true)
