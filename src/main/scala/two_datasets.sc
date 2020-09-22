@@ -23,7 +23,6 @@ val tvDf = spark.read.format("csv")
   .count().withColumnRenamed("count", "tv_count")
 
 //TODO: IKKE LES NULL VERDIER
-
 val kickDf = spark.read.format("csv")
   .option("header", value = true)
   .option("inferSchema", "true")
