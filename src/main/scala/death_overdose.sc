@@ -63,3 +63,4 @@ val gunDeathByRace = gunDf.filter(predicate).groupBy(col("Date"))
   )
 
 overdoseByRace.join(gunDeathByRace, "Date").show()
+overdoseByRace.join(gunDeathByRace, "Date").explain(true)
