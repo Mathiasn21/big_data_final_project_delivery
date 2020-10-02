@@ -16,9 +16,6 @@ val spark = SparkSession.builder
   .appName("Testing App")
   .getOrCreate()
 
-//Special import that comes after init of spark session
-import spark.implicits._
-
 def loadDf(file: String): DataFrame = (spark.read format "csv")
   .option("header", "true")
   .option("inferSchema", "true")

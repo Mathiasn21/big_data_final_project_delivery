@@ -22,8 +22,6 @@ val tvDf = spark.read.format("csv")
   .groupBy("Year")
   .count().withColumnRenamed("count", "tv_count")
 
-//TODO: IKKE LES NULL VERDIER
-
 val kickDf = spark.read.format("csv")
   .option("header", value = true)
   .option("inferSchema", "true")
