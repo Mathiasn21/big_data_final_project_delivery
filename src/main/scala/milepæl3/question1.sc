@@ -13,6 +13,16 @@ import spark.implicits._
 
 val sc = spark.sparkContext
 val filePath = "D:\\data\\crime_in_context_19752015.csv"
+
+val df = spark.read.format("csv")
+  .option("header", "true")
+  .option("inferSchema", "true")
+  .load(filePath)
+df.show()
+
 val file = sc.textFile(filePath)
-val headers = file.collect()
-file.collect().foreach(println)
+val headers = file.first()
+val filtered = file.filter(line => line != headers)
+
+val splitFile = filtered.flatMap(line => line.split(","))
+splitFile.collect().foreach(println)
