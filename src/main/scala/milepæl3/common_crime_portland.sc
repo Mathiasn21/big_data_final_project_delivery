@@ -1,6 +1,7 @@
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.{Column, SaveMode, SparkSession}
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 val spark = SparkSession.builder
@@ -16,28 +17,28 @@ val filePath = "D:\\data\\crime_in_context_19752015.csv"
 
 val file = sc.textFile(filePath)
 
-val headers = file.map(line => {
-  line.split(",")
-})
-
+val headers = file.map(line => line.split(","))
 val head = headers.first()
 
-print(head.mkString(", "))
-
-
 val indexOfCity = head.indexWhere(str => str.equals("agency_jurisdiction"))
-val crime_first = head.indexWhere(str => str.equals("homicides_percapita"))
-val crime_last = head.indexWhere(str => str.equals("robberies_percapita"))
+val crimeFirst = head.indexWhere(str => str.equals("homicides_percapita"))
+val crimeLast = head.indexWhere(str => str.equals("robberies_percapita"))
+val yearIndex = head.indexWhere(str => str.equals("report_year"))
 
 val splitFile = file.map(line => {
   line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", head.length)
 })
 
+var map = mutable.HashMap[Int, String](-1 -> "")
+for (i <- head.indices) {
+  map += (i -> head(i))
+}
+
 val filtered = splitFile.filter(arr => arr(indexOfCity).contains("Portland"))
 
-val convert = (arr: Array[String]) => {
+val convertToDouble = (arr: Array[String]) => {
   val convertedArr = ListBuffer[Double]()
-  for (i <- crime_first to crime_last) {
+  for (i <- crimeFirst to crimeLast) {
     val str = arr(i)
     if(str == null || str.isBlank){
       convertedArr += 0
@@ -48,9 +49,38 @@ val convert = (arr: Array[String]) => {
   convertedArr.toArray
 }
 
+val convertToInt = (str: String) => {
+  var i = 0
+  if (!(str == null) && !str.isBlank) {
+    i = str.toInt
+  }
+  i
+}
 
-val t = filtered.map(arr => (arr(indexOfCity), convert(arr)))
-t.collect().foreach(arr => {
-  println(arr._1, arr._2.mkString("Array(", ", ", ")"))
-})
+
+var maxValIndex = (arr: Array[Double]) => {
+  var max = 0.0
+  var maxIndex = -1
+  for (i <- arr.indices) {
+    val d = arr(i)
+    if(max < d){
+      max = d
+      maxIndex = i
+    }
+  }
+  maxIndex = if(maxIndex == -1) maxIndex else maxIndex + crimeFirst
+  (max, map(maxIndex))
+}
+
 //Find most common crime in portland.
+val summedRDD = filtered.map(
+  arr => (
+    convertToInt(arr(yearIndex)),
+    arr(indexOfCity),
+    maxValIndex(convertToDouble(arr))
+  )
+)
+
+summedRDD.collect().foreach(arr => {
+  println(arr._1, arr._2, arr._3)
+})
