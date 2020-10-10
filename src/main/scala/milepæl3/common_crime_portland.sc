@@ -57,7 +57,6 @@ val convertToInt = (str: String) => {
   i
 }
 
-
 var maxValIndex = (arr: Array[Double]) => {
   var max = 0.0
   var maxIndex = -1
@@ -76,11 +75,19 @@ var maxValIndex = (arr: Array[Double]) => {
 val summedRDD = filtered.map(
   arr => (
     convertToInt(arr(yearIndex)),
-    arr(indexOfCity),
+    arr(indexOfCity).replaceAll("[\",]", ""),
     maxValIndex(convertToDouble(arr))
   )
 )
 
 summedRDD.collect().foreach(arr => {
-  println(arr._1, arr._2, arr._3)
+  println(arr._1, arr._2, arr._3._1, arr._3._2)
 })
+
+//Write res to disk:
+val finalRDD = summedRDD.map(row => {
+  val str = row._1 + "," + row._2 +
+    "," + row._3._2 + "," + row._3._1
+  str
+})
+finalRDD.coalesce(1).saveAsTextFile("D:\\data\\t.csv")
