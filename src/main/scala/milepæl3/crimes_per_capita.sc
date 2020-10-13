@@ -36,11 +36,9 @@ val mapped = splitFile.map(arr => (arr(2), convertToDouble(arr(10))))
 
 val reducedRDD = mapped.reduceByKey ((a, b) => (a + b))
 
-val maxValue = reducedRDD.max
-
 val maxKey2 = reducedRDD.max()(new Ordering[(String, Double)]() {
   override def compare(x: (String, Double), y: (String, Double)): Int =
     Ordering[Double].compare(x._2, y._2)
 })
-
+sc.parallelize(Seq(maxKey2)).saveAsTextFile("path")
 print(maxKey2)
