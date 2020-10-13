@@ -17,8 +17,8 @@ val filePath = "D:\\data\\crime_in_context_19752015.csv"
 
 val file = sc.textFile(filePath)
 
-val headers = file.map(line => line.split(","))
-val head = headers.first()
+val headers = file.first().split(",")
+val head = headers
 
 val indexOfCity = head.indexWhere(str => str.equals("agency_jurisdiction"))
 val crimeFirst = head.indexWhere(str => str.equals("homicides_percapita"))
