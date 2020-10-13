@@ -13,13 +13,14 @@ import org.apache.spark.streaming.kafka010.KafkaUtils
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 
 
-System.setProperty("java.security.auth.login.config", "D:\\projects_git\\Semester5\\big_data\\jaas.conf")
 Logger.getLogger("org").setLevel(Level.WARN)
 Logger.getLogger("akka").setLevel(Level.WARN)
 
 val username = "aneqi8m2"
 val password = "tiYqB_68T6l8OZU30p22LqTrXAsfEmCJ"
 val topic = "aneqi8m2-news"
+val jaasTemplate = "org.apache.kafka.common.security.scram.ScramLoginModule required serviceName=\"kafka\" username=\"%s\" password=\"%s\";"
+val jaasCfg = String.format(jaasTemplate, username, password)
 
 /*
 val spark = SparkSession.builder
@@ -37,6 +38,7 @@ val kafkaParams = Map[String, Object](
   "auto.offset.reset" -> "latest",
   "security.protocol" -> "SASL_SSL",
   "sasl.mechanisms" -> "SCRAM-SHA-256",
+  "sasl.jaas.config" -> jaasCfg,
   "sasl.username" -> username,
   "sasl.password" -> password,
   "enable.auto.commit" -> (false: java.lang.Boolean)
@@ -51,7 +53,6 @@ val stream = KafkaUtils.createDirectStream[String, String](
 )
 
 stream.print()
-print("Starting stream\n")
 streamingContext.start()
-print("Printing messages: \n")
+print("Starting stream\n")
 streamingContext.awaitTermination()
