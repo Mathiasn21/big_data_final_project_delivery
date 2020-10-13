@@ -34,7 +34,7 @@ val convertToDouble = (str: String) => {
 
 val mapped = splitFile.map(arr => (arr(2), convertToDouble(arr(10))))
 
-val reducedRDD = mapped.reduceByKey ((a, b) => (a + b))
+val reducedRDD = mapped.reduceByKey ((a, b) => a + b)
 
 val maxKey2 = reducedRDD.max()(new Ordering[(String, Double)]() {
   override def compare(x: (String, Double), y: (String, Double)): Int =
