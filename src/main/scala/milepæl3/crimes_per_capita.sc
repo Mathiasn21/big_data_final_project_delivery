@@ -40,5 +40,5 @@ val maxKey2 = reducedRDD.max()(new Ordering[(String, Double)]() {
   override def compare(x: (String, Double), y: (String, Double)): Int =
     Ordering[Double].compare(x._2, y._2)
 })
-sc.parallelize(Seq(maxKey2)).saveAsTextFile("path")
+sc.parallelize(Seq(maxKey2)).saveAsTextFile("/data/max")
 print(maxKey2)
