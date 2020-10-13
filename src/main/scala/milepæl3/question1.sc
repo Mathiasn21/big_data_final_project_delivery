@@ -1,13 +1,18 @@
 import org.apache.log4j.{Level, Logger}
+import org.apache.spark
 import org.apache.spark.sql.{Column, SaveMode, SparkSession}
+
+
 
 Logger.getLogger("org").setLevel(Level.WARN)
 Logger.getLogger("akka").setLevel(Level.WARN)
+
 
 val spark = SparkSession.builder
   .master("local[*]")
   .appName("Testing App")
   .getOrCreate()
+
 
 import spark.implicits._
 
