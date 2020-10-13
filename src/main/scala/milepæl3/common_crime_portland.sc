@@ -15,11 +15,11 @@ val sc = spark.sparkContext
 val filePath = "D:\\data\\crime_in_context_19752015.csv"
 //val filePath = "crime_in_context_19752015.csv"
 
-val file = sc.textFile(filePath)
+var file = sc.textFile(filePath)
 
 val headers = file.first()
 val head = headers.split(",")
-file.filter(line => line != headers)
+file = file.filter(line => line != headers && !line.contains("United States"))
 
 val indexOfCity = head.indexWhere(str => str.equals("agency_jurisdiction"))
 val crimeFirst = head.indexWhere(str => str.equals("homicides_percapita"))
