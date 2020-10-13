@@ -1,6 +1,21 @@
-val filePath = "crime_in_context_19752015.csv"
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.{Column, SaveMode, SparkSession}
+
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
+
+val spark = SparkSession.builder
+  .master("local[*]")
+  .appName("Testing App")
+  .getOrCreate()
+
+import spark.implicits._
+
+val sc = spark.sparkContext
+val filePath = "D:\\data\\crime_in_context_19752015.csv"
+//val filePath = "crime_in_context_19752015.csv"
+
 var file = sc.textFile(filePath)
-file.collect().foreach(println)
 val headers = file.first()
 val head = headers.split(",")
 file = file.filter(line => line != headers && !line.contains("United States"))
@@ -8,8 +23,6 @@ val splitFile = file.map(line => {
   line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", head.length)
 })
 splitFile.collect().foreach ( x => println(x.mkString(", ")))
-
-import scala.collection.mutable.ListBuffer
 
 val convertToDouble = (str: String) => {
   var i = 0.0
@@ -25,3 +38,9 @@ val reducedRDD = mapped.reduceByKey ((a, b) => (a + b))
 
 val maxValue = reducedRDD.max
 
+val maxKey2 = reducedRDD.max()(new Ordering[(String, Double)]() {
+  override def compare(x: (String, Double), y: (String, Double)): Int =
+    Ordering[Double].compare(x._2, y._2)
+})
+
+print(maxKey2)
