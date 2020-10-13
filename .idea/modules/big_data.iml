@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="bigdata [file:/C:/Users/marpe/Documents/bigdata/]" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
+<module external.linked.project.id="big_data [file:/D:/projects_git/Semester5/big_data/]" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
   <component name="CheckStyle-IDEA-Module">
     <option name="configuration">
       <map />
@@ -112,6 +112,7 @@
     <orderEntry type="library" name="sbt: org.apache.httpcomponents:httpclient:4.2.5:jar" level="project" />
     <orderEntry type="library" name="sbt: org.apache.httpcomponents:httpcore:4.2.4:jar" level="project" />
     <orderEntry type="library" name="sbt: org.apache.ivy:ivy:2.4.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.kafka:kafka-clients:2.4.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.apache.orc:orc-core:1.5.10:jar" level="project" />
     <orderEntry type="library" name="sbt: org.apache.orc:orc-mapreduce:1.5.10:jar" level="project" />
     <orderEntry type="library" name="sbt: org.apache.orc:orc-shims:1.5.10:jar" level="project" />
@@ -129,7 +130,9 @@
     <orderEntry type="library" name="sbt: org.apache.spark:spark-network-shuffle_2.12:3.0.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.apache.spark:spark-sketch_2.12:3.0.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.apache.spark:spark-sql_2.12:3.0.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.spark:spark-streaming-kafka-0-10_2.12:3.0.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.apache.spark:spark-tags_2.12:3.0.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.spark:spark-token-provider-kafka-0-10_2.12:3.0.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.apache.spark:spark-unsafe_2.12:3.0.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.apache.ws.xmlschema:xmlschema-core:2.2.5:jar" level="project" />
     <orderEntry type="library" name="sbt: org.apache.xbean:xbean-asm7-shaded:4.15:jar" level="project" />
