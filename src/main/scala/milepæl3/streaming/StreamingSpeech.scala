@@ -1,6 +1,8 @@
 package milepæl3.streaming
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{Column, ForeachWriter, Row, SparkSession}
+import org.apache.spark.sql.functions.{col, from_json, lower}
+import org.apache.spark.sql.types.{DoubleType, IntegerType, StringType, StructField, StructType}
 //Credentials(Uname, password, topic)
 
 object StreamingSpeech{
@@ -9,11 +11,10 @@ object StreamingSpeech{
     Logger.getLogger("akka").setLevel(Level.WARN)
     val spark = SparkSession.builder()
       .master("local[*]")
-      .appName("HDFS")
+      .appName("Kafka")
       .getOrCreate()
 
     import spark.implicits._
-
     val streamIn = spark.readStream
       .format("kafka")
       .option("kafka.security.protocol", "SASL_SSL")
@@ -24,11 +25,36 @@ object StreamingSpeech{
       .option("startingOffsets", "earliest")
       .load()
 
-    val waterMarked = streamIn.withWatermark("timestamp", "1 second")
-    val formattedDF = waterMarked.select($"timestamp", $"value".cast("string").alias("parsedValue"))
-    val query2 = formattedDF.writeStream.format("console").start()
+    val ifTrumpOrBiden = (column:Column) => {
+      column.contains()
+      true
+    }
 
-    print(query2.status)
-    query2.awaitTermination()
+    val waterMarked = streamIn.withWatermark("timestamp", "1 second")
+    val formattedDF = waterMarked.select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))
+      .select("timestamp", "data.*")
+    val filteredDF = formattedDF.filter(
+      lower($"author").contains("trump") ||
+      lower($"author").contains("biden") ||
+      lower($"content").contains("trump") ||
+      lower($"content").contains("biden")
+    )
+    val query = filteredDF.writeStream.format("console").option("truncate", value = false).start()
+    query.awaitTermination()
+  }
+
+  private def getSchema:StructType={
+    StructType(
+      StructField("author", StringType, nullable = true) ::
+      StructField("content", StringType, nullable = true) ::
+      StructField("date", StringType, nullable = true) ::
+      StructField("id", IntegerType, nullable = true) ::
+      StructField("month", DoubleType, nullable = true) ::
+      StructField("publication", StringType, nullable = true) ::
+      StructField("retrieved", StringType, nullable = true) ::
+      StructField("title", StringType, nullable = true) ::
+      StructField("url", StringType, nullable = true) ::
+      StructField("year", DoubleType, nullable = true) :: Nil
+    )
   }
 }
