@@ -2,7 +2,7 @@ package milepæl3.streaming
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.{from_json, lower, struct, to_json}
+import org.apache.spark.sql.functions.{from_json, lower, struct, to_json, unix_timestamp, window}
 import org.apache.spark.sql.types._
 //Credentials(Uname, password, topic)
 
@@ -38,17 +38,10 @@ object StreamingEx6{
       lower($"content").contains("biden")
     )
 
-    val trumpFilteredDf = filteredDf.filter(
-      lower($"author").contains("trump") ||
-        lower($"content").contains("trump")
-    )
-
-    val bidenFilteredDf = filteredDf.filter(
-      lower($"author").contains("biden") ||
-        lower($"content").contains("biden")
-    )
-    bidenFilteredDf.select($"id".cast(StringType).as("key"), to_json(struct( $"author", $"id", $"content")).as("value"))
-      .writeStream.format("kafka")
+    val ourWindows = window( $"timestamp", "5 seconds", "5 seconds", "1 second")
+    val trumpFilteredDf = filteredDf.filter(lower($"author").contains("trump") || lower($"content").contains("trump"))
+    trumpFilteredDf.withColumn("timestamp", unix_timestamp(trumpFilteredDf("timestamp"), "yyyy-MM-dd HH:mm:ss").cast("timestamp"))
+      .writeStream.format("console").option("truncate", value = false).start().awaitTermination()
 
   }
 

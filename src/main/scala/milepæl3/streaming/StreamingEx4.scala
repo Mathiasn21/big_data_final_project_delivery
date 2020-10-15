@@ -26,7 +26,6 @@ object StreamingEx4{
       .option("startingOffsets", "earliest")
       .load()
 
-    val ourWindows = window( $"timestamp", "7 days", "7 days", "5 days")
     val waterMarked = streamIn.withWatermark("timestamp", "1 second")
     val formattedDF = waterMarked
       .select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))
