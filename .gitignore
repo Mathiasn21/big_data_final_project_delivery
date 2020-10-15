@@ -5,6 +5,7 @@ test/
 .cache/
 .history/
 .lib/
+test2/
 dist/*
 target/
 lib_managed/

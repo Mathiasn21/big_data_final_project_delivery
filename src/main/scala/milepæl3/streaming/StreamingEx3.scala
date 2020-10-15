@@ -44,16 +44,14 @@ object StreamingEx3{
       lower($"author").contains("biden") ||
         lower($"content").contains("biden")
     )
-
     bidenFilteredDf.select($"id".cast(StringType).as("key"), to_json(struct( $"author", $"id", $"content")).as("value"))
       .writeStream.format("kafka")
       .option("kafka.security.protocol", "SASL_SSL")
       .option("kafka.sasl.mechanism", "SCRAM-SHA-256")
       .option("kafka.sasl.jaas.config", """org.apache.kafka.common.security.scram.ScramLoginModule required username="aneqi8m2" password="tiYqB_68T6l8OZU30p22LqTrXAsfEmCJ";""")
       .option("kafka.bootstrap.servers", "rocket-01.srvs.cloudkafka.com:9094,rocket-02.srvs.cloudkafka.com:9094,rocket-03.srvs.cloudkafka.com:9094")
-      .option("topic", "aneqi8m2-Trump").option("checkpointLocation", "D:\\projects_git\\Semester5\\big_data\\test")
+      .option("topic", "aneqi8m2-Biden").option("checkpointLocation", "D:\\projects_git\\Semester5\\big_data\\test2")
       .start()
-      .awaitTermination()
 
     trumpFilteredDf.select($"id".cast(StringType).as("key"), to_json(struct( $"author", $"id", $"content")).as("value"))
       .writeStream.format("kafka")
@@ -61,7 +59,7 @@ object StreamingEx3{
       .option("kafka.sasl.mechanism", "SCRAM-SHA-256")
       .option("kafka.sasl.jaas.config", """org.apache.kafka.common.security.scram.ScramLoginModule required username="aneqi8m2" password="tiYqB_68T6l8OZU30p22LqTrXAsfEmCJ";""")
       .option("kafka.bootstrap.servers", "rocket-01.srvs.cloudkafka.com:9094,rocket-02.srvs.cloudkafka.com:9094,rocket-03.srvs.cloudkafka.com:9094")
-      .option("topic", "aneqi8m2-Biden").option("checkpointLocation", "D:\\projects_git\\Semester5\\big_data\\test")
+      .option("topic", "aneqi8m2-Trump").option("checkpointLocation", "D:\\projects_git\\Semester5\\big_data\\test")
       .start()
       .awaitTermination()
 
