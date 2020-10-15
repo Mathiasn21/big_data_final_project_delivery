@@ -5,7 +5,7 @@ import org.apache.spark.sql.functions.{col, from_json, lower, struct, to_json}
 import org.apache.spark.sql.types.{DoubleType, IntegerType, StringType, StructField, StructType}
 //Credentials(Uname, password, topic)
 
-object StreamingSpeech{
+object StreamingEx3{
   def main(args:Array[String]):Unit= {
     Logger.getLogger("org").setLevel(Level.WARN)
     Logger.getLogger("akka").setLevel(Level.WARN)
@@ -44,6 +44,7 @@ object StreamingSpeech{
       lower($"author").contains("biden") ||
         lower($"content").contains("biden")
     )
+
     bidenFilteredDf.select($"id".cast(StringType).as("key"), to_json(struct( $"author", $"id", $"content")).as("value"))
       .writeStream.format("kafka")
       .option("kafka.security.protocol", "SASL_SSL")
@@ -63,6 +64,7 @@ object StreamingSpeech{
       .option("topic", "aneqi8m2-Biden").option("checkpointLocation", "D:\\projects_git\\Semester5\\big_data\\test")
       .start()
       .awaitTermination()
+
     /*
     bidenFilteredDf.filter("").writeStream.format("kafka")
       .option("kafka.security.protocol", "SASL_SSL")
