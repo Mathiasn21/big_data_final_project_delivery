@@ -25,11 +25,6 @@ object StreamingSpeech{
       .option("startingOffsets", "earliest")
       .load()
 
-    val ifTrumpOrBiden = (column:Column) => {
-      column.contains()
-      true
-    }
-
     val waterMarked = streamIn.withWatermark("timestamp", "1 second")
     val formattedDF = waterMarked.select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))
       .select("timestamp", "data.*")
