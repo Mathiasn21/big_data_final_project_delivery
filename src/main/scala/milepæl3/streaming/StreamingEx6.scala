@@ -1,8 +1,10 @@
 package milepæl3.streaming
 
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.{from_json, lower, struct, to_json, unix_timestamp, window}
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.{Row, SparkSession}
+import org.apache.spark.sql.functions.{col, count, from_json, greatest, lag, lower, struct, to_json, unix_timestamp, window}
+import org.apache.spark.sql.streaming.{OutputMode, Trigger}
 import org.apache.spark.sql.types._
 //Credentials(Uname, password, topic)
 
@@ -26,23 +28,28 @@ object StreamingEx6{
       .option("startingOffsets", "earliest")
       .load()
 
-    val waterMarked = streamIn.withWatermark("timestamp", "1 second")
+    val waterMarked = streamIn
+      .withColumn("timestamp", unix_timestamp(streamIn("timestamp"), "yyyy-MM-dd HH:mm:ss").cast("timestamp"))
+      .withWatermark("timestamp", "1 second")
+
     val formattedDF = waterMarked
       .select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))
       .select("timestamp", "data.*")
 
-    val filteredDf = formattedDF.filter(
-      lower($"author").contains("trump") ||
-      lower($"author").contains("biden") ||
-      lower($"content").contains("trump") ||
-      lower($"content").contains("biden")
-    )
+    val trumpFilteredDf = formattedDF
+      .filter(lower($"author").contains("trump") || lower($"content").contains("trump"))
 
-    val ourWindows = window( $"timestamp", "5 seconds", "5 seconds", "1 second")
-    val trumpFilteredDf = filteredDf.filter(lower($"author").contains("trump") || lower($"content").contains("trump"))
-    trumpFilteredDf.withColumn("timestamp", unix_timestamp(trumpFilteredDf("timestamp"), "yyyy-MM-dd HH:mm:ss").cast("timestamp"))
-      .writeStream.format("console").option("truncate", value = false).start().awaitTermination()
+    val myWindow = window($"timestamp", "10 seconds", "10 seconds")
 
+    val trumWindowed = trumpFilteredDf.groupBy(myWindow).count()
+
+    trumWindowed.writeStream
+      .format("console")
+      .option("truncate", value = false)
+      .trigger(Trigger.ProcessingTime("10 seconds"))
+      .outputMode(OutputMode.Update())
+      .start()
+      .awaitTermination()
   }
 
   private def getSchema:StructType={
