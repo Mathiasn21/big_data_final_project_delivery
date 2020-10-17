@@ -3,7 +3,7 @@ package milepæl3.streaming
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.{Row, SparkSession}
-import org.apache.spark.sql.functions.{col, count, from_json, greatest, lag, lower, struct, to_json, unix_timestamp, window}
+import org.apache.spark.sql.functions.{avg, col, count, from_json, greatest, lag, last, lower, struct, to_json, unix_timestamp, window}
 import org.apache.spark.sql.streaming.{OutputMode, Trigger}
 import org.apache.spark.sql.types._
 //Credentials(Uname, password, topic)
@@ -39,11 +39,12 @@ object StreamingEx6{
     val trumpFilteredDf = formattedDF
       .filter(lower($"author").contains("trump") || lower($"content").contains("trump"))
 
+    val joinExpr =  col("t_1.timestamp") === col("t_2.timestamp")
     val myWindow = window($"timestamp", "10 seconds", "10 seconds")
 
-    val trumWindowed = trumpFilteredDf.groupBy(myWindow).count()
-
-    trumWindowed.writeStream
+    val trumpWindowed = trumpFilteredDf.as("t_1").join(trumpFilteredDf.as("t_2"), joinExpr).groupBy(myWindow).count()
+    trumpWindowed
+      .writeStream
       .format("console")
       .option("truncate", value = false)
       .trigger(Trigger.ProcessingTime("10 seconds"))
