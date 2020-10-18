@@ -46,6 +46,7 @@ object StreamingEx3{
       lower($"author").contains("biden") ||
         lower($"content").contains("biden")
     )
+
     bidenFilteredDf.select($"id".cast(StringType).as("key"), to_json(struct( $"author", $"id", $"content")).as("value"))
       .writeStream.format("kafka")
       .option("kafka.security.protocol", "SASL_SSL")

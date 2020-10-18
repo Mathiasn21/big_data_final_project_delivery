@@ -1,8 +1,9 @@
 package milepæl3.streaming
 
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.{from_json, lower, struct, to_json, window}
+import org.apache.spark.sql.{Row, SparkSession}
+import org.apache.spark.sql.functions.{array_remove, count, from_json, lower, regexp_replace, split, struct, to_json, unix_timestamp, window}
+import org.apache.spark.sql.streaming.{OutputMode, Trigger}
 import org.apache.spark.sql.types._
 //Credentials(Uname, password, topic)
 
@@ -26,20 +27,34 @@ object StreamingEx4{
       .option("startingOffsets", "earliest")
       .load()
 
-    val waterMarked = streamIn.withWatermark("timestamp", "1 second")
-    val formattedDF = waterMarked
+    val formattedDF = streamIn
       .select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))
       .select("timestamp", "data.*")
 
-    val filteredDf = formattedDF.filter(
+    val waterMarked = formattedDF
+      .withColumn("retrieved", unix_timestamp(formattedDF("retrieved"), "yyyy-MM-dd HH:mm:ss.SSSSSS").cast("timestamp"))
+      .withWatermark("retrieved", "120 minutes")
+
+    val filteredDf = waterMarked.filter(
       lower($"author").contains("trump") ||
-      lower($"content").contains("trump")
+        lower($"author").contains("clinton") ||
+        lower($"author").contains("biden") ||
+        lower($"content").contains("trump") ||
+        lower($"content").contains("clinton") ||
+        lower($"content").contains("biden")
     )
 
-    filteredDf
-      .select($"id".cast(StringType).as("key"), to_json(struct( $"author", $"id", $"content")).as("value"))
-      .writeStream.format("console")
-      .start().awaitTermination()
+    val countedDf = filteredDf.withColumn("count_struct",
+      split(regexp_replace(lower($"title"), "\\b(?!trump|biden|clinton\\b)\\S+|s+|[^A-Za-z]", ","), ","))
+
+    val myWindow = window($"retrieved", "45 minutes", "45 minutes")
+    val trumpWindowed = countedDf.groupBy(myWindow).count()
+
+    countedDf
+      .writeStream.format("console").option("truncate", value = false).trigger(Trigger.ProcessingTime("10 seconds"))
+      .outputMode(OutputMode.Append())
+      .start()
+      .awaitTermination()
   }
 
   private def getSchema:StructType={
