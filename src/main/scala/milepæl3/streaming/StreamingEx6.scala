@@ -7,6 +7,12 @@ import org.apache.spark.sql.streaming.{OutputMode, Trigger}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 //Credentials(Uname, password, topic)
+/*Lag en spørring som som skriver en melding til konsollet hver gang, innenfor et vindu på 1
+time at antall avisartikler som har blitt publisert i news som inneholder ordet “Trump” har
+doblet seg i forhold til forrige intervall.
+Bruk dokumentasjonen for å finne ut hvordan dere kan gjøre dette:
+ https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/functions.html
+* */
 
 object StreamingEx6{
   def main(args:Array[String]):Unit= {
@@ -58,7 +64,6 @@ object StreamingEx6{
           val count = row.getLong(1)
           val prev = row.getLong(2)
 
-          print(row.getStruct(0).equals(lastTime))
           if (row.getStruct(0).equals(lastTime) && count >= lastIntervalCount * 2 || count >= prev * 2) {
             print("\nSeeing a doubling of Trump!\n")
           }
