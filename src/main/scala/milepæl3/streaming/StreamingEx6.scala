@@ -2,16 +2,16 @@ package milepæl3.streaming
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.expressions.Window
-import org.apache.spark.sql.{Row, SparkSession}
-import org.apache.spark.sql.functions.{avg, col, count, from_json, greatest, lag, last, lower, struct, to_json, unix_timestamp, window}
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.{OutputMode, Trigger}
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 //Credentials(Uname, password, topic)
 
 object StreamingEx6{
   def main(args:Array[String]):Unit= {
-    Logger.getLogger("org").setLevel(Level.WARN)
-    Logger.getLogger("akka").setLevel(Level.WARN)
+    Logger.getLogger("org").setLevel(Level.ERROR)
+    Logger.getLogger("akka").setLevel(Level.ERROR)
     val spark = SparkSession.builder()
       .master("local[*]")
       .appName("Kafka")
@@ -39,18 +39,42 @@ object StreamingEx6{
     val trumpFilteredDf = formattedDF
       .filter(lower($"author").contains("trump") || lower($"content").contains("trump"))
 
-    val joinExpr =  col("t_1.timestamp") === col("t_2.timestamp")
-    val myWindow = window($"timestamp", "10 seconds", "10 seconds")
+    val myWindow = window($"timestamp", "60 seconds", "60 seconds")
+    val trumpWindowed = trumpFilteredDf.groupBy(myWindow).count()
 
-    val trumpWindowed = trumpFilteredDf.as("t_1").join(trumpFilteredDf.as("t_2"), joinExpr).groupBy(myWindow).count()
-    trumpWindowed
-      .writeStream
-      .format("console")
+    var lastIntervalCount = Long.MaxValue
+    var lastTime:Row = null
+    val staticWindow = Window.orderBy($"window")
+
+    val query = trumpWindowed.writeStream
+      .format("memory")
       .option("truncate", value = false)
-      .trigger(Trigger.ProcessingTime("10 seconds"))
+      .option("checkpointLocation", "D:\\projects_git\\Semester5\\big_data\\test")
+      .foreachBatch { (df: DataFrame, _: Long) => {
+        val newDf = df.withColumn("prev_count", lag($"count", 1, 0).over(staticWindow))
+        newDf.show(50, truncate = false)
+
+        newDf.foreach((row:Row) => {
+          val count = row.getLong(1)
+          val prev = row.getLong(2)
+
+          print(row.getStruct(0).equals(lastTime))
+          if (row.getStruct(0).equals(lastTime) && count >= lastIntervalCount * 2 || count >= prev * 2) {
+            print("\nSeeing a doubling of Trump!\n")
+          }
+        })
+
+        val maxTime = newDf.sort($"window.end".desc).limit(1)
+        maxTime.show(50, truncate = false)
+
+        val firstVal = maxTime.first()
+        lastIntervalCount = firstVal.getLong(1)
+        lastTime = firstVal.getStruct(0)
+
+      }}.trigger(Trigger.ProcessingTime("59 seconds"))
       .outputMode(OutputMode.Update())
       .start()
-      .awaitTermination()
+    query.awaitTermination()
   }
 
   private def getSchema:StructType={
