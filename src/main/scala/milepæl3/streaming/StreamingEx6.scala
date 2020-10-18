@@ -76,7 +76,7 @@ object StreamingEx6{
         lastIntervalCount = firstVal.getLong(1)
         lastTime = firstVal.getStruct(0)
 
-      }}.trigger(Trigger.ProcessingTime("60 seconds"))
+      }}.trigger(Trigger.ProcessingTime("61 seconds"))
       .outputMode(OutputMode.Append())
       .start()
     query.awaitTermination()
