@@ -21,6 +21,7 @@ object StreamingEx4{
       .getOrCreate()
 
     import spark.implicits._
+
     val streamIn = spark.readStream
       .format("kafka")
       .option("kafka.security.protocol", "SASL_SSL")
@@ -102,7 +103,7 @@ object StreamingEx4{
         val v = map(word)
         thing = thing :+ v
       } catch {
-        case Exception =>
+        case e: Exception =>
           print("Word not found :( " + word)
           thing = thing :+ word
       }
