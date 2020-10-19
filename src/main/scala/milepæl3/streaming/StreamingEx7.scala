@@ -12,6 +12,8 @@ import scala.reflect.internal.util.TableDef.Column
 //Credentials(Uname, password, topic)
 
 object StreamingEx7{
+  var mapped:Map[String, String] = null
+
   def main(args:Array[String]):Unit= {
     Logger.getLogger("org").setLevel(Level.WARN)
     Logger.getLogger("akka").setLevel(Level.WARN)
@@ -34,37 +36,8 @@ object StreamingEx7{
     val df1 = df.na.fill("")
     val dictDf = df1.withColumn("fonet", concat_ws(" ", col("_c1"), col("_c2"), col("_c3"))).drop("_c1", "_c2", "_c3")
 
-    val mapped = dictDf.map(r => (r.getAs[String](0), r.getAs[String](1))).collect.toMap
-
-    def myFunction = udf((str: Array[String]) => {
-      var thing = Seq[String]()
-      str.foreach((word:String) => {
-        try {
-          val v = mapped(word)
-          thing = thing :+ v
-        } catch {
-          case e: Exception =>
-            print("Word not found :( " + word)
-            thing = thing :+ word
-        }
-      })
-      thing.mkString(" ")
-    })
-
-    def getSchema:StructType={
-      StructType(
-        StructField("author", StringType, nullable = true) ::
-          StructField("content", StringType, nullable = true) ::
-          StructField("date", StringType, nullable = true) ::
-          StructField("id", IntegerType, nullable = true) ::
-          StructField("month", DoubleType, nullable = true) ::
-          StructField("publication", StringType, nullable = true) ::
-          StructField("retrieved", StringType, nullable = true) ::
-          StructField("title", StringType, nullable = true) ::
-          StructField("url", StringType, nullable = true) ::
-          StructField("year", DoubleType, nullable = true) :: Nil
-      )
-    }
+    mapped = dictDf.map(r => (r.getAs[String](0), r.getAs[String](1))).collect.toMap
+    print(mapped, "\n")
 
     val streamIn = spark.readStream
       .format("kafka")
@@ -80,11 +53,43 @@ object StreamingEx7{
     val formattedDF = waterMarked.select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))
       .select("timestamp", "data.*")
     val filteredDF = formattedDF
-      .withColumn("Fonetisk oversatt", myFunction(split($"title", " "))
-    )
+      .withColumn("CMUdict", myFunction(array_join(split($"title", " "), ","))).select($"timestamp", $"author", $"title", $"date", $"CMUdict")
 
     //[!._,'’@?“”"//\$\(\)\|\:-\s]
-    val query = filteredDF.writeStream.format("console").option("truncate", value = false).start()
+    val query = filteredDF.writeStream
+      .format("console")
+      .option("truncate", value = false).start()
     query.awaitTermination()
+  }
 
-}}
+  private def myFunction = udf((str: String) => {
+    var thing = Seq[String]()
+    str.split(",").foreach((word:String) => {
+      try {
+        val v = mapped(word.toLowerCase)
+        thing = thing :+ v
+      } catch {
+        case e: Exception =>
+          print("Word not found :( " + word, "\n\n\n\n", e)
+          thing = thing :+ word
+      }
+    })
+    thing.mkString(" ")
+  })
+
+  private def getSchema:StructType={
+    StructType(
+      StructField("author", StringType, nullable = true) ::
+        StructField("content", StringType, nullable = true) ::
+        StructField("date", StringType, nullable = true) ::
+        StructField("id", IntegerType, nullable = true) ::
+        StructField("month", DoubleType, nullable = true) ::
+        StructField("publication", StringType, nullable = true) ::
+        StructField("retrieved", StringType, nullable = true) ::
+        StructField("title", StringType, nullable = true) ::
+        StructField("url", StringType, nullable = true) ::
+        StructField("year", DoubleType, nullable = true) :: Nil
+    )
+  }
+
+}
