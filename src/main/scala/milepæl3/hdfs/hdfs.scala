@@ -13,7 +13,7 @@ object hdfs{
         Logger.getLogger("akka").setLevel(Level.WARN)
 
         val path = "hdfs://10.0.0.95:9000/crime_in_context_19752015.csv"
-        val pathOut = "hdfs://10.0.0.95:9000/crime_stats/crime_in_protland.csv"
+        val pathOut = "hdfs://10.0.0.95:9000/crime_stats/crime_in_portland.csv"
         val spark = SparkSession.builder()
           .master("local[*]")
           .appName("HDFS")
