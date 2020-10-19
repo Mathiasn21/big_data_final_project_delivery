@@ -37,7 +37,6 @@ object StreamingEx7{
     val dictDf = df1.withColumn("fonet", concat_ws(" ", col("_c1"), col("_c2"), col("_c3"))).drop("_c1", "_c2", "_c3")
 
     mapped = dictDf.map(r => (r.getAs[String](0), r.getAs[String](1))).collect.toMap
-    print(mapped, "\n")
 
     val streamIn = spark.readStream
       .format("kafka")
@@ -53,7 +52,7 @@ object StreamingEx7{
     val formattedDF = waterMarked.select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))
       .select("timestamp", "data.*")
     val filteredDF = formattedDF
-      .withColumn("CMUdict", myFunction(array_join(split($"title", " "), ","))).select($"timestamp", $"author", $"title", $"date", $"CMUdict")
+      .withColumn("CMUdict", myFunction(array_join(split($"title", "[,\\.\"\'\\?\\@\\s]"), ","))).select($"timestamp", $"author", $"title", $"date", $"CMUdict")
 
     //[!._,'’@?“”"//\$\(\)\|\:-\s]
     val query = filteredDF.writeStream
