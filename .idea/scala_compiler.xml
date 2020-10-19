@@ -4,6 +4,8 @@
     <option name="deprecationWarnings" value="true" />
     <option name="uncheckedWarnings" value="true" />
     <option name="featureWarnings" value="true" />
-    <profile name="sbt 1" modules="big_data" />
+    <profile name="sbt 1" modules="big_data">
+      <option name="postfixOps" value="true" />
+    </profile>
   </component>
 </project>

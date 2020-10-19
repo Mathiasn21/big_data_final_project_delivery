@@ -1,10 +1,14 @@
 package milepæl3.streaming
 
+import java.util.regex.Pattern
+
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.{Row, SparkSession}
-import org.apache.spark.sql.functions.{array_remove, count, from_json, lower, regexp_replace, split, struct, to_json, unix_timestamp, window}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.{OutputMode, Trigger}
 import org.apache.spark.sql.types._
+
+import scala.reflect.internal.util.TableDef.Column
 //Credentials(Uname, password, topic)
 
 object StreamingEx4{
@@ -44,8 +48,13 @@ object StreamingEx4{
         lower($"content").contains("biden")
     )
 
-    val countedDf = filteredDf.withColumn("count_struct",
-      split(regexp_replace(lower($"title"), "\\b(?!trump|biden|clinton\\b)\\S+|s+|[^A-Za-z]", ","), ","))
+    //regexp_extract(lower($"title"), "\\b(?!trump|biden|clinton\\b)\\S+|s+|[^A-Za-z]", ","),
+
+    val countedDf = filteredDf
+      .withColumn("words", extractAll(lower($"title"), "(trump|biden|clinton)"))
+      .withColumn()
+      .groupBy("retrieved","title","words").count()
+      .filter($"words".notEqual(""))
 
     val myWindow = window($"retrieved", "45 minutes", "45 minutes")
     val trumpWindowed = countedDf.groupBy(myWindow).count()
@@ -71,4 +80,16 @@ object StreamingEx4{
       StructField("year", DoubleType, nullable = true) :: Nil
     )
   }
+  private def extractAll = udf((str: String, exp: String) => {
+    var i = 0
+    val pattern = Pattern.compile(exp)
+    val matcher = pattern.matcher(str)
+    var res = Seq[String]()
+    while (matcher.find) {
+      res = res :+ matcher.group(i)
+      i = i + 1
+    }
+    res.mkString(",")
+  })
+
 }
