@@ -2,7 +2,7 @@ package milepæl3.streaming
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.{from_json, lower, struct, to_json}
+import org.apache.spark.sql.functions.{from_json, lower, map_values, struct, to_json}
 import org.apache.spark.sql.types._
 //Credentials(Uname, password, topic)
 
@@ -30,7 +30,12 @@ object StreamingEx2{
     val formattedDf = waterMarked
       .select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))
       .select("timestamp", "data.*")
-    formattedDf.writeStream.format("console").start().awaitTermination()
+    formattedDf
+      .writeStream
+      .format("console")
+      .option("truncate", value = false)
+      .start()
+      .awaitTermination()
   }
 
   private def getSchema:StructType={

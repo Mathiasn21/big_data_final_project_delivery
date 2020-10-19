@@ -54,12 +54,16 @@ object StreamingEx4{
       .withColumn("words", explode(split($"words", ",")))
       //.groupBy("retrieved","title", "words").count()
 
+
+    // countedDf.withColumn("newCol", myFunction(split($"title", "[!._,'’@?“”\"//\\$\\(\\)\\|\\:-\\s]")))
     val myWindow = window($"retrieved", "45 seconds", "45 seconds")
     val windowed = countedDf.groupBy(myWindow, $"words").count()
 
-
     windowed
-      .writeStream.format("console").option("truncate", value = false).trigger(Trigger.ProcessingTime("10 seconds"))
+      .writeStream
+      .format("console")
+      .option("truncate", value = false)
+      .trigger(Trigger.ProcessingTime("10 seconds"))
       .outputMode(OutputMode.Update())
       .start()
       .awaitTermination()
@@ -79,9 +83,10 @@ object StreamingEx4{
       StructField("year", DoubleType, nullable = true) :: Nil
     )
   }
+
   private def extractAll = udf((str: String, exp: String) => {
-    val pattern = Pattern.compile(exp.toString)
-    val matcher = pattern.matcher(str.toString)
+    val pattern = Pattern.compile(exp)
+    val matcher = pattern.matcher(str)
     var res = Seq[String]()
     while (matcher.find) {
       res = res :+ matcher.group(0)
@@ -89,4 +94,19 @@ object StreamingEx4{
     res.mkString(",")
   })
 
+  /* val map:Map[String, String] = null
+  private def myFunction = udf((str: Array[String]) => {
+    var thing = Seq[String]()
+    str.foreach((word:String) => {
+      try {
+        val v = map(word)
+        thing = thing :+ v
+      } catch {
+        case Exception =>
+          print("Word not found :( " + word)
+          thing = thing :+ word
+      }
+    })
+    thing.mkString(" ")
+  })*/
 }
