@@ -37,7 +37,7 @@ object StreamingEx4{
 
     val waterMarked = formattedDF
       .withColumn("retrieved", unix_timestamp(formattedDF("retrieved"), "yyyy-MM-dd HH:mm:ss.SSSSSS").cast("timestamp"))
-      .withWatermark("retrieved", "120 minutes")
+      .withWatermark("retrieved", "120 seconds")
 
     val filteredDf = waterMarked.filter(
       lower($"author").contains("trump") ||
@@ -51,12 +51,11 @@ object StreamingEx4{
     //regexp_extract(lower($"title"), "\\b(?!trump|biden|clinton\\b)\\S+|s+|[^A-Za-z]", ","),
 
     val countedDf = filteredDf
-      .withColumn("words", extractAll(lower($"title"), "(trump|biden|clinton)"))
-      .withColumn()
-      .groupBy("retrieved","title","words").count()
+      .withColumn("words", extractAll(lower($"title"), lit("(trump|biden|clinton)")))
+      .withColumn("words", explode(split($"words", ",")))
       .filter($"words".notEqual(""))
 
-    val myWindow = window($"retrieved", "45 minutes", "45 minutes")
+    val myWindow = window($"retrieved", "45 seconds", "45 seconds")
     val trumpWindowed = countedDf.groupBy(myWindow).count()
 
     countedDf
