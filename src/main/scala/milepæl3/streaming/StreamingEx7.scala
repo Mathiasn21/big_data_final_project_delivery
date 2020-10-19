@@ -1,3 +1,5 @@
+package milepæl3.streaming
+
 import java.util.regex.Pattern
 
 import org.apache.log4j.{Level, Logger}
@@ -26,12 +28,10 @@ object StreamingEx7{
         StructField("_c2", StringType, nullable=false) ::
         StructField("_c3", StringType, nullable=false) :: Nil
     )
-    val df = spark.read.schema(schema).options(Map("delimiter"->" ")).csv("/home/mathias/data/cmudict.dict")
+    val path = "hdfs://10.0.0.95:9000/cmudict.dict"
+    val df = spark.read.schema(schema).options(Map("delimiter"->" ")).csv(path)
 
     val df1 = df.na.fill("")
-    import  org.apache.spark.sql.functions._
-    import org.apache.spark.sql.functions.col
-
     val dictDf = df1.withColumn("fonet", concat_ws(" ", col("_c1"), col("_c2"), col("_c3"))).drop("_c1", "_c2", "_c3")
 
     val mapped = dictDf.map(r => (r.getAs[String](0), r.getAs[String](1))).collect.toMap
@@ -80,9 +80,10 @@ object StreamingEx7{
     val formattedDF = waterMarked.select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))
       .select("timestamp", "data.*")
     val filteredDF = formattedDF
-      .withColumn("Fonetisk oversatt", myFunction(split($"title", "[!._,'’@?“”\"//\\$\\(\\)\\|\\:-\\s]"))
+      .withColumn("Fonetisk oversatt", myFunction(split($"title", " "))
     )
 
+    //[!._,'’@?“”"//\$\(\)\|\:-\s]
     val query = filteredDF.writeStream.format("console").option("truncate", value = false).start()
     query.awaitTermination()
 
