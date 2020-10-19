@@ -48,19 +48,19 @@ object StreamingEx4{
         lower($"content").contains("biden")
     )
 
-    //regexp_extract(lower($"title"), "\\b(?!trump|biden|clinton\\b)\\S+|s+|[^A-Za-z]", ","),
-
     val countedDf = filteredDf
-      .withColumn("words", extractAll(lower($"title"), lit("(trump|biden|clinton)")))
-      .withColumn("words", explode(split($"words", ",")))
+      .withColumn("words", extractAll(lower($"title"), lit("(clinton|biden|trump)")))
       .filter($"words".notEqual(""))
+      .withColumn("words", explode(split($"words", ",")))
+      //.groupBy("retrieved","title", "words").count()
 
     val myWindow = window($"retrieved", "45 seconds", "45 seconds")
-    val trumpWindowed = countedDf.groupBy(myWindow).count()
+    val windowed = countedDf.groupBy(myWindow, $"words").count()
 
-    countedDf
+
+    windowed
       .writeStream.format("console").option("truncate", value = false).trigger(Trigger.ProcessingTime("10 seconds"))
-      .outputMode(OutputMode.Append())
+      .outputMode(OutputMode.Update())
       .start()
       .awaitTermination()
   }
@@ -80,13 +80,11 @@ object StreamingEx4{
     )
   }
   private def extractAll = udf((str: String, exp: String) => {
-    var i = 0
-    val pattern = Pattern.compile(exp)
-    val matcher = pattern.matcher(str)
+    val pattern = Pattern.compile(exp.toString)
+    val matcher = pattern.matcher(str.toString)
     var res = Seq[String]()
     while (matcher.find) {
-      res = res :+ matcher.group(i)
-      i = i + 1
+      res = res :+ matcher.group(0)
     }
     res.mkString(",")
   })
