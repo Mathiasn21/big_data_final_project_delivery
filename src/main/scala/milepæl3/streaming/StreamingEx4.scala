@@ -94,20 +94,4 @@ object StreamingEx4{
     }
     res.mkString(",")
   })
-
-  /* val map:Map[String, String] = null
-  private def myFunction = udf((str: Array[String]) => {
-    var thing = Seq[String]()
-    str.foreach((word:String) => {
-      try {
-        val v = map(word)
-        thing = thing :+ v
-      } catch {
-        case e: Exception =>
-          print("Word not found :( " + word)
-          thing = thing :+ word
-      }
-    })
-    thing.mkString(" ")
-  })*/
 }
