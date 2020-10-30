@@ -1,0 +1,24 @@
+[
+  {"ids": ["id_1", "id_2", "id_n"]},
+
+
+  {"sessions": ["S_1", "S_2", "S_n"]},
+
+
+  {"users": ["admin_2", "admin_1"]},
+
+
+  {"sum_col1": 2},
+  {"sum_col2": 5},
+
+
+  {"admin_2": {
+      "name": {
+        "f_name": "first",
+        "l_name": "last"
+      }
+    }
+  },
+
+  {"S_1": {"session_info": "info here...."}}
+]
