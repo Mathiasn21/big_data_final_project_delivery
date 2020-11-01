@@ -44,7 +44,7 @@
       "publisher": String
     }
   },
-  {"author": "books":[{
+  {"books_by_author": [{
       "bookID": {
         "bookID": ObjectID,
         "title": String,
@@ -61,6 +61,23 @@
       }
     }]
   },
+
+
+  {"all_author_stats": [{
+    "author_stats": {
+      "average_rating": Double,
+      "isbn": String,
+      "isbn13": String,
+      "language_code": String,
+      "num_pages": Int,
+      "ratings_count": Int,
+      "text_reviews_count": Int,
+      "publication_date": String,
+      "publisher": String
+    }
+  }]
+  },
+
 
 
   {"sum_col1": Int},
