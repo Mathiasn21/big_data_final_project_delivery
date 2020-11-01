@@ -1,24 +1,70 @@
 [
-  {"ids": ["id_1", "id_2", "id_n"]},
+  {"sess_id": {
+      "sess_id": ObjectID,
+      "session_info": String
+    }
+  },
+
+  {"sessions": ["sess_id": ObjectID]},
+
+  {"users": [
+      {
+        "user_id": ObjectID,
+        "name": {
+          "f_name": String,
+          "l_name": String
+        }
+      }
+    ]
+  },
 
 
-  {"sessions": ["S_1", "S_2", "S_n"]},
-
-
-  {"users": ["admin_2", "admin_1"]},
-
-
-  {"sum_col1": 2},
-  {"sum_col2": 5},
-
-
-  {"admin_2": {
+  {"user_id": {
       "name": {
-        "f_name": "first",
-        "l_name": "last"
+        "f_name": String,
+        "l_name": String
       }
     }
   },
 
-  {"S_1": {"session_info": "info here...."}}
+  {"all_book_ids": ["bookID": ObjectID]},
+
+  {"bookID": {
+      "bookID": ObjectID,
+      "title": String,
+      "authors": String,
+      "average_rating": Double,
+      "isbn": String,
+      "isbn13": String,
+      "language_code": String,
+      "num_pages": Int,
+      "ratings_count": Int,
+      "text_reviews_count": Int,
+      "publication_date": String,
+      "publisher": String
+    }
+  },
+  {"author": "books":[{
+      "bookID": {
+        "bookID": ObjectID,
+        "title": String,
+        "authors": String,
+        "average_rating": Double,
+        "isbn": String,
+        "isbn13": String,
+        "language_code": String,
+        "num_pages": Int,
+        "ratings_count": Int,
+        "text_reviews_count": Int,
+        "publication_date": String,
+        "publisher": String
+      }
+    }]
+  },
+
+
+  {"sum_col1": Int},
+  {"sum_col2": Int}
 ]
+
+
