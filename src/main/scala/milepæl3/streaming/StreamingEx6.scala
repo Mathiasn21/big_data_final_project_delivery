@@ -64,8 +64,9 @@ object StreamingEx6{
           val count = row.getLong(1)
           val prev = row.getLong(2)
 
-          if (row.getStruct(0).equals(lastTime) && count >= lastIntervalCount * 2 || count >= prev * 2) {
-            print("\nSeeing a doubling of Trump!\n")
+          if ((!row.getStruct(0).equals(lastTime) && count >= lastIntervalCount * 2) || count >= prev * 2) {
+            print(row)
+            print("Seeing a doubling of Trump!\n\n\n")
           }
         })
 
@@ -77,7 +78,7 @@ object StreamingEx6{
         lastTime = firstVal.getStruct(0)
 
       }}.trigger(Trigger.ProcessingTime("61 seconds"))
-      .outputMode(OutputMode.Append())
+      .outputMode(OutputMode.Update())
       .start()
     query.awaitTermination()
   }

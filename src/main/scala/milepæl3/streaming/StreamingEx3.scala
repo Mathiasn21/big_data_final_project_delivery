@@ -1,9 +1,8 @@
 package milepæl3.streaming
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.{Column, ForeachWriter, Row, SparkSession}
-import org.apache.spark.sql.functions.{col, from_json, lower, struct, to_json}
-import org.apache.spark.sql.types.{DoubleType, IntegerType, StringType, StructField, StructType}
-//Credentials(Uname, password, topic)
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.{from_json, lower, struct, to_json}
+import org.apache.spark.sql.types._
 
 object StreamingEx3{
   def main(args:Array[String]):Unit= {
