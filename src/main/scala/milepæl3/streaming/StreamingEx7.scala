@@ -1,14 +1,9 @@
 package milepæl3.streaming
 
-import java.util.regex.Pattern
-
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.streaming.{OutputMode, Trigger}
 import org.apache.spark.sql.types._
-
-import scala.reflect.internal.util.TableDef.Column
 //Credentials(Uname, password, topic)
 
 object StreamingEx7{
