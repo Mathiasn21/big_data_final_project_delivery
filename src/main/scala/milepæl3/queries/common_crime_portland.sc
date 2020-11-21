@@ -30,6 +30,7 @@ val splitFile = file.map(line => {
   line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", head.length)
 })
 
+
 var map = mutable.HashMap[Int, String](-1 -> "")
 for (i <- head.indices) {
   map += (i -> head(i))
@@ -91,4 +92,6 @@ val finalRDD = summedRDD.map(row => {
     "," + row._3._2 + "," + row._3._1
   str
 })
+print(finalRDD.coalesce(1).toDebugString)
+
 finalRDD.coalesce(1).saveAsTextFile("D:\\data\\t.csv")
