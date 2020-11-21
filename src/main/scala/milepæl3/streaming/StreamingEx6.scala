@@ -57,8 +57,8 @@ object StreamingEx6{
           val count = row.getLong(1)
           val prev = row.getLong(2)
 
-          if ((!row.getStruct(0).equals(lastTime) && count >= lastIntervalCount * 2) || count >= prev * 2) {
-            print(row)
+          print(row + "\n")
+          if (count >= prev * 2) {
             print("Seeing a doubling of Trump!\n\n\n")
           }
         })

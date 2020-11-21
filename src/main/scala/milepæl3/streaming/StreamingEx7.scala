@@ -47,7 +47,8 @@ object StreamingEx7{
     val formattedDF = waterMarked.select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))
       .select("timestamp", "data.*")
     val filteredDF = formattedDF
-      .withColumn("CMUdict", myFunction(array_join(split($"title", "[,\\.\"\'\\?\\@\\s]"), ","))).select($"timestamp", $"author", $"title", $"date", $"CMUdict")
+      .withColumn("CMUdict", myFunction(array_join(split($"title", "[,\\.\"\'\\?\\@\\s]"), ",")))
+      .select($"timestamp", $"author", $"title", $"date", $"CMUdict")
 
     //[!._,'’@?“”"//\$\(\)\|\:-\s]
     val query = filteredDF.writeStream
@@ -85,5 +86,4 @@ object StreamingEx7{
         StructField("year", DoubleType, nullable = true) :: Nil
     )
   }
-
 }
