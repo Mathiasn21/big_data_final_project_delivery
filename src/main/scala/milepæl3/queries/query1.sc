@@ -25,6 +25,6 @@ val headers = file.first()
 val filtered = file.filter(line => line != headers)
 
 val splitFile = filtered.flatMap(line => line.split(","))
-print(splitFile.toDebugString)
+print("RDD lineage: \n", splitFile.toDebugString)
 
 splitFile.collect().foreach(println)
