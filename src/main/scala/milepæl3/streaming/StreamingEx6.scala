@@ -57,7 +57,6 @@ object StreamingEx6{
           val count = row.getLong(1)
           val prev = row.getLong(2)
 
-          print(row + "\n")
           if (count >= prev * 2) {
             print("Seeing a doubling of Trump!\n\n\n")
           }
