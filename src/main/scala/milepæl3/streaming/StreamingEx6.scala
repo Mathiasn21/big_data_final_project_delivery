@@ -51,20 +51,19 @@ object StreamingEx6{
       .option("checkpointLocation", "D:\\projects_git\\Semester5\\big_data\\test")
       .foreachBatch { (df: DataFrame, _: Long) => {
         val newDf = df.withColumn("prev_count", lag($"count", 1, 0).over(staticWindow))
-        newDf.show(50, truncate = false)
-
         newDf.foreach((row:Row) => {
           val count = row.getLong(1)
-          val prev = row.getLong(2)
-
+          val windowStruct = row.getStruct(0)
+          var prev = row.getLong(2)
+          if (lastTime != null && prev == 0 && (windowStruct.equals(lastTime) || windowStruct.getTimestamp(1).equals(lastTime.getTimestamp(0)))){
+            prev = lastIntervalCount
+          }
           if (count >= prev * 2) {
-            print("Seeing a doubling of Trump!\n\n\n")
+            print("Seeing a doubling of Trump!" + "\n")
+            print( "Prev value: " + prev + " Current value: " + count + "\n\n\n")
           }
         })
-
         val maxTime = newDf.sort($"window.end".desc).limit(1)
-        maxTime.show(50, truncate = false)
-
         val firstVal = maxTime.first()
         lastIntervalCount = firstVal.getLong(1)
         lastTime = firstVal.getStruct(0)
