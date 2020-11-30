@@ -15,6 +15,9 @@ val spark = SparkSession.builder
   .appName("Testing App")
   .getOrCreate()
 
+/*
+  What is the top 10 highest rated shows on the whole dataset and which streaming services offers these shows?
+ */
 val df = spark.read.format("csv")
   .option("header", value = true)
   .option("inferSchema", "true")
@@ -34,6 +37,6 @@ val result = df
   ).drop("Netflix", "Hulu", "Prime Video", "Disney+")
 
 result.explain(true)
-//result.write.mode(SaveMode.Overwrite).format("csv").save("C:\\Users\\marpe\\Documents\\bigdata\\skriv_til")
+result.write.mode(SaveMode.Overwrite).format("csv").save("C:\\Users\\marpe\\Documents\\bigdata\\skriv_til")
 
 
