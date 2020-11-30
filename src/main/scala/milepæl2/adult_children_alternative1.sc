@@ -14,18 +14,25 @@ val spark = SparkSession.builder
   .appName("Testing App")
   .getOrCreate()
 
-//Special import that comes after init of spark session
-//import spark.implicits._
-
+/*
+    Which streaming service releases most adult (18+) series
+    and which service releases most series for children?
+    Alternative 1
+ */
 val df = spark.read.format("csv")
   .option("header", "true")
   .option("inferSchema", "true")
   .load("C:\\Users\\marpe\\Documents\\bigdata_data\\tv-shows.csv")
 
-
+/*Anonymous function that takes a column and String Value as parameters.
+  This function counts if the column is of value 1, meaning has the streaming service available,
+  and the "Age" column is a certain value
+  The column names creates are the column names and "Age" values
+ */
 val condition = (column: Column, value: String) =>
     count(when(column === 1 && col("Age") === value, 1)).as(column.toString() + " " + value)
 
+//Passes the streaming services and age values into the anonymous function
 val countDf =df.agg(
   condition(col("Prime Video"), "18+"),
   condition(col("Netflix"), "18+"),
@@ -38,15 +45,21 @@ val countDf =df.agg(
 
 
 val cols = countDf.columns
+//splits the columns in two
 val split = cols.splitAt(cols.length / 2)
+
+//Separates the streaming services for 18+ and "all"
 val predicate = (c:String) => struct(col(c).as("v"), lit(c).as("k"))
 val structCols18 = split._1.map(predicate)
 val structColsAll = split._2.map(predicate)
 
-val max_df = countDf
+//Puts the streaming service for the most adult and children series in a new column
+val maxDf = countDf
   .withColumn("maxCol 18+", greatest(structCols18: _*)
   .getItem("k"))
   .withColumn("maxCol All", greatest(structColsAll: _*)
     .getItem("k"))
 
-max_df.show()
+//max_df.show()
+maxDf.write.mode(SaveMode.Overwrite).format("csv").save("D:\\data\\testing")
+
