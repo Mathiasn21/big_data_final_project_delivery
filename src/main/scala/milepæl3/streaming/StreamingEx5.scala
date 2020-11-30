@@ -6,7 +6,7 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 //Credentials(Uname, password, topic)
 
-object StreamingEx7{
+object StreamingEx5{
   var mapped:Map[String, String] = null
 
   def main(args:Array[String]):Unit= {

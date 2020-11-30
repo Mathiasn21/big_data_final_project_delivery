@@ -89,7 +89,7 @@ if __name__ == '__main__':
                     sys.stderr.write(
                         '%% Local producer queue is full (%d messages awaiting delivery): try again\n' % len(p))
                 p.poll(0)
-                time.sleep(1.0)
+                time.sleep(0.5)
 
     sys.stderr.write('%% Waiting for %d deliveries\n' % len(p))
     p.flush()
