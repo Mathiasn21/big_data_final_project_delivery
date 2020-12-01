@@ -15,6 +15,7 @@ val filePath = "D:\\data\\crime_in_context_19752015.csv"
 var file = sc.textFile(filePath)
 val headers = file.first()
 val head = headers.split(",")
+
 file = file.filter(line => line != headers && !line.contains("United States"))
 val splitFile = file.map(line => {
   line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", head.length)
