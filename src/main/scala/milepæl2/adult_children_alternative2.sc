@@ -32,7 +32,7 @@ val netflix = df.where(col("Netflix") === 1 && col("Age") === "18+").count()
 val hulu = df.where(col("Hulu") === 1 && col("Age") === "18+").count()
 val disney = df.where(col("Disney+") === 1 && col("Age") === "18+").count()
 
-//counts the occurrence of series allowed for all)children) in each streaming service
+//counts the occurrence of series allowed for all(children) in each streaming service
 val prime2 = df.where(col("Prime Video") === 1 && col("Age") === "all").count()
 val netflix2 = df.where(col("Netflix") === 1 && col("Age") === "all").count()
 val hulu2 = df.where(col("Hulu") === 1 && col("Age") === "all").count()

@@ -9,11 +9,8 @@ val spark = SparkSession.builder
   .appName("Testing App")
   .getOrCreate()
 
-import spark.implicits._
-
 val sc = spark.sparkContext
 val filePath = "D:\\data\\crime_in_context_19752015.csv"
-//val filePath = "crime_in_context_19752015.csv"
 
 var file = sc.textFile(filePath)
 val headers = file.first()
@@ -24,6 +21,9 @@ val splitFile = file.map(line => {
 })
 splitFile.collect().foreach ( x => println(x.mkString(", ")))
 
+//Which city had the highest crime rate per capita?
+
+//Function that converts String to Double
 val convertToDouble = (str: String) => {
   var i = 0.0
   if (!(str == null) && !str.isBlank) {
@@ -32,10 +32,12 @@ val convertToDouble = (str: String) => {
   i
 }
 
-val mapped = splitFile.map(arr => (arr(2), convertToDouble(arr(10))))
+//Creates a key-value RDD by mapping
+val keyValueRDD = splitFile.map(arr => (arr(2), convertToDouble(arr(10))))
+//combines values with the same key
+val reducedRDD = keyValueRDD.reduceByKey ((a, b) => a + b)
 
-val reducedRDD = mapped.reduceByKey ((a, b) => a + b)
-
+//Function that sorts reducedRDD and then picks the max value
 val maxKey2 = reducedRDD.max()(new Ordering[(String, Double)]() {
   override def compare(x: (String, Double), y: (String, Double)): Int =
     Ordering[Double].compare(x._2, y._2)

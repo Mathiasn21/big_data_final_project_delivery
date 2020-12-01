@@ -31,27 +31,31 @@ df.describe().show()
    What is the average number tv-shows released pr year?
  */
 def query_1(df: DataFrame): Unit = {
+  //groups by year, counts tv shows for each year, then calculates the average
   df.groupBy("Year")
     .count()
     .agg(avg("count").as("Avg_year"))
-    .show()
+    //.show()
+    .write.mode(SaveMode.Overwrite).format("csv").save("D:\\data\\testing")
 }
 
 /*
     Which streaming service has the most and least tv-series available?
  */
+
 def query_2(df : DataFrame): Unit = {
+  //aggregates the sum of the streaming service columns
   val summedDf = df.agg(
     sum("Hulu").as("Hulu_sum"),
     sum("Disney+").as("Disney_sum"),
     sum("Netflix").as("Netflix_sum"),
     sum("Prime Video").as("Prime_Vid_sum")
   )
-
   val structs = summedDf.columns.tail.map(
+    //creates a new struct column that composes of input column v and k
     c => struct(col(c).as("v"), lit(c).as("k"))
   )
-
+  //adds a max and min column to summedDF
   summedDf.withColumn("maxCol", greatest(structs: _*).getItem("k"))
     .withColumn("minCol", least(structs: _*).getItem("k")).show()
 }
@@ -61,6 +65,7 @@ def query_2(df : DataFrame): Unit = {
  */
 
 def query_3(df: DataFrame): Unit = {
+  //groups IMDb by year and calculates the sum of ratings, sorts then picks the first value
   val res = df.filter("IMDb is not null").groupBy("Year")
     .sum("IMDb").sort(column("sum(IMDb)").desc).limit(1)
     res.show()

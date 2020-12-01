@@ -23,6 +23,13 @@ val df = spark.read.format("csv")
   .option("inferSchema", "true")
   .load("C:\\Users\\marpe\\Documents\\bigdata\\data\\tv-shows.csv")
 
+/*
+Selects the streaming services, sorts descendingly by the IMDDb column,
+and picks the 10 first tv-shows
+Then checks if a streaming service has the value 1, meaning it has the tv-show available.
+If it does then the streaming show is added to the topp10 column.
+ */
+
 val result = df
   .select("Title", "IMDb", "Netflix", "Hulu", "Prime Video", "Disney+")
   .sort(desc("IMDb"))
@@ -34,6 +41,7 @@ val result = df
       when(col("Disney+") === 1, lit("Disney+")),
       when(col("Netflix") === 1, lit("Netflix"))
     )
+    //Unnecessary columns are dropped.
   ).drop("Netflix", "Hulu", "Prime Video", "Disney+")
 
 result.explain(true)
