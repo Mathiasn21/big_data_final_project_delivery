@@ -29,7 +29,7 @@ val file = sc.textFile(filePath)
 val headers = file.first()
 val filtered = file.filter(line => line != headers)
 
-val splitFile = filtered.flatMap(line => line.split(","))
+val splitFile = filtered.map(line => line.split(","))
 print(splitFile.toDebugString)
 
 splitFile.collect().foreach(println)

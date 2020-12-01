@@ -1,52 +1,50 @@
 package milepæl3.streaming
 
+import java.time.LocalDateTime
 import java.util.regex.Pattern
 
+import org.apache.kafka.common.utils.Utils.sleep
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.udf
+import org.apache.spark.sql.functions.{lit, udf}
 import org.apache.spark.sql.streaming.{OutputMode, Trigger}
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.{Row, SparkSession}
 
 object ProduceMessages {
-  //Credentials(Uname, password, topic)
+  private val schema = new StructType()
+    .add("id", IntegerType, nullable = true)
+    .add("title", StringType, nullable = true)
+    .add("publication", StringType, nullable = true)
+    .add("author", StringType, nullable = true)
+    .add("date", StringType, nullable = true)
+    .add("year", DoubleType, nullable = true)
+    .add("month", DoubleType, nullable = true)
+    .add("url", StringType, nullable = true)
+    .add("content", StringType, nullable = true)
+    .add("retrieved", StringType, nullable = true)
 
   def main(args: Array[String]): Unit = {
     Logger.getLogger("org").setLevel(Level.WARN)
     Logger.getLogger("akka").setLevel(Level.WARN)
 
-    val path = "D:\\data\\all_the_news"
-
-    val spark = SparkSession.builder()
+    spark = SparkSession.builder()
       .master("local[*]")
       .appName("Produce messages")
       .getOrCreate()
-    val regex = "^\\d+,(?P<id>(\"(?:[^\"\\]|\\.)*\")|([^,]*)),(?P<title>(\"(?:[^\"\\]|\\.)*\")|([^,]*)),(?P<publication>(\"(?:[^\"\\]|\\.)*\")|([^,]+)),(?P<author>(\"(?:[^\"\\]|\\.)*\")|([^,]*)),(?P<date>(\"(?:[^\"\\]|\\.)*\")|([^,]*)),(?P<year>(\"(?:[^\"\\]|\\.)*\")|([^,]*)),(?P<month>(\"(?:[^\"\\]|\\.)*\")|([^,]*)),(?P<url>(\"(?:[^\"\\]|\\.)*\")|([^,]*)),(?P<content>(\"(?:[^\"\\]|\\.)*\")|([^,]*))$"
 
-    val schema = new StructType()
-      .add("id", StringType, nullable = true)
-      .add("title", StringType, nullable = true)
-      .add("publication", StringType, nullable = true)
-      .add("author", StringType, nullable = true)
-      .add("date", StringType, nullable = true)
-      .add("year", StringType, nullable = true)
-      .add("month", StringType, nullable = true)
-      .add("url", StringType, nullable = true)
-      .add("content", StringType, nullable = true)
-      .add("ZipCodeType", StringType, nullable = true)
+    val path = "D:\\data\\all_the_news"
 
     val streamIn = spark.readStream
       .option("maxFilesPerTrigger", 1)
-      .textFile(path)
+      .text(path)
 
+      streamIn.withColumn("parsed_values", extract(streamIn("value")))
       .writeStream
       .format("console")
       .option("truncate", value = false)
       .trigger(Trigger.ProcessingTime("5 seconds"))
       .outputMode(OutputMode.Update())
-
-
-      streamIn.start().awaitTermination()
+      .start().awaitTermination()
 
     /*read.writeStream.format("kafka")
       .option("kafka.security.protocol", "SASL_SSL")
@@ -59,13 +57,43 @@ object ProduceMessages {
       .load()*/
   }
 
-  private def extract = udf((str: String, regex: String) => {
+  private def extract = udf((str: String) => {
+    val regex = "^\\d+,(?<id>(\\\"(?:[^\\\"\\\\]|\\\\.)*\\\")|([^,]*))," +
+      "(?<title>(\\\"(?:[^\\\"\\\\]|\\\\.)*\\\")|([^,]*))," +
+      "(?<publication>(\\\"(?:[^\\\"\\\\]|\\\\.)*\\\")|([^,]+))," +
+      "(?<author>(\\\"(?:[^\\\"\\\\]|\\\\.)*\\\")|([^,]*))," +
+      "(?<date>(\\\"(?:[^\\\"\\\\]|\\\\.)*\\\")|([^,]*))," +
+      "(?<year>(\\\"(?:[^\\\"\\\\]|\\\\.)*\\\")|([^,]*))," +
+      "(?<month>(\\\"(?:[^\\\"\\\\]|\\\\.)*\\\")|([^,]*))," +
+      "(?<url>(\\\"(?:[^\\\"\\\\]|\\\\.)*\\\")|([^,]*))," +
+      "(?<content>(\".*\"))"
+    //Had to alter the last regex(content) to avoid recurring group captures. Which caused fatal errors in spark
+
+    sleep(500)
     val pattern = Pattern.compile(regex)
     val matcher = pattern.matcher(str)
-    var res = Seq[String]()
-    while (matcher.find) {
-      res = res :+ matcher.group(0)
+    val res = ""
+
+    if(matcher.find()) {
+      val random = new scala.util.Random
+      val timeRetrieved = LocalDateTime.now().minusSeconds(random.nextInt(3600)).toString
+
+      val id = matcher.group("id")
+      val title = matcher.group("title")
+      val publication = matcher.group("publication")
+      val author = matcher.group("author")
+      val date = matcher.group("date")
+      val year = matcher.group("year")
+      val month = matcher.group("month")
+      val content = matcher.group("content")
+
+      val data = Seq(
+        Row(id, title, publication,
+          author, date, year, month,
+          content, timeRetrieved)
+      )
     }
-    res.mkString(",")
+
+    lit(res)
   })
 }
