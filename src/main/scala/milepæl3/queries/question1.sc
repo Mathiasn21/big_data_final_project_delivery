@@ -23,13 +23,16 @@ val df = spark.read.format("csv")
   .option("header", "true")
   .option("inferSchema", "true")
   .load(filePath)
-df.show()
 
-val file = sc.textFile(filePath)
+var file = sc.textFile(filePath)
 val headers = file.first()
-val filtered = file.filter(line => line != headers)
+val head = headers.split(",")
+file = file.filter(line => line != headers && !line.contains("United States"))
+val splitFile = file.map(line => {
+  line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", head.length)
+})
+splitFile.collect().foreach ( x => println(x.mkString(", ")))
 
-val splitFile = filtered.map(line => line.split(","))
 print(splitFile.toDebugString)
 
 splitFile.collect().foreach(println)
