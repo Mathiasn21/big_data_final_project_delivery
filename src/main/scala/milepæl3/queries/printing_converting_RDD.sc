@@ -29,4 +29,4 @@ val splitFile = file.map(line => {
 })
 splitFile.collect().foreach ( x => println(x.mkString(", ")))
 
-
+print(splitFile.toDebugString)
