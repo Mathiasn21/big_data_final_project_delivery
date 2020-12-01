@@ -13,7 +13,6 @@ import spark.implicits._
 
 val sc = spark.sparkContext
 val filePath = "D:\\data\\crime_in_context_19752015.csv"
-//val filePath = "crime_in_context_19752015.csv"
 
 var file = sc.textFile(filePath)
 
