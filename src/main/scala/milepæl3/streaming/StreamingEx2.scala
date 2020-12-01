@@ -30,6 +30,8 @@ object StreamingEx2{
     val formattedDf = waterMarked
       .select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))
       .select("timestamp", "data.*")
+
+    
     formattedDf
       .writeStream
       .format("console")
