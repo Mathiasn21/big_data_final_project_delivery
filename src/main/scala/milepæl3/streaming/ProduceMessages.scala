@@ -72,7 +72,7 @@ object ProduceMessages {
     sleep(500)
     val pattern = Pattern.compile(regex)
     val matcher = pattern.matcher(str)
-    val res = ""
+    var res = ""
 
     if(matcher.find()) {
       val random = new scala.util.Random
