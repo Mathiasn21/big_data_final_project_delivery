@@ -40,6 +40,8 @@ def query_1(df: DataFrame): Unit = {
 /*
     Which streaming service has the most and least tv-series available?
  */
+
+//aggregates the sum of the streaming service columns
 def query_2(df : DataFrame): Unit = {
   val summedDf = df.agg(
     sum("Hulu").as("Hulu_sum"),
@@ -48,10 +50,12 @@ def query_2(df : DataFrame): Unit = {
     sum("Prime Video").as("Prime_Vid_sum")
   )
 
+  //creates a new struct column that composes of input column v and k
   val structs = summedDf.columns.tail.map(
     c => struct(col(c).as("v"), lit(c).as("k"))
   )
 
+  //adds a max and min column to summedDF
   summedDf.withColumn("maxCol", greatest(structs: _*).getItem("k"))
     .withColumn("minCol", least(structs: _*).getItem("k")).show()
 }
@@ -60,6 +64,7 @@ def query_2(df : DataFrame): Unit = {
     What year released the shows with highest rating?
  */
 
+//groups IMDb by year and calculates the sum of ratings, sorts and picks the first value
 def query_3(df: DataFrame): Unit = {
   val res = df.filter("IMDb is not null").groupBy("Year")
     .sum("IMDb").sort(column("sum(IMDb)").desc).limit(1)

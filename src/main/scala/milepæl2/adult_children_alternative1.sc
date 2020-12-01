@@ -25,9 +25,9 @@ val df = spark.read.format("csv")
   .load("C:\\Users\\marpe\\Documents\\bigdata_data\\tv-shows.csv")
 
 /*Anonymous function that takes a column and String Value as parameters.
-  This function counts if the column is of value 1, meaning has the streaming service available,
+  This function counts if the column is of value 1, meaning it has the streaming service available,
   and the "Age" column is a certain value
-  The column names creates are the column names and "Age" values
+  The count column gets an alias of the column names and "Age" values
  */
 val condition = (column: Column, value: String) =>
     count(when(column === 1 && col("Age") === value, 1)).as(column.toString() + " " + value)
@@ -53,7 +53,7 @@ val predicate = (c:String) => struct(col(c).as("v"), lit(c).as("k"))
 val structCols18 = split._1.map(predicate)
 val structColsAll = split._2.map(predicate)
 
-//Puts the streaming service for the most adult and children series in a new column
+//Puts the streaming services with the most adult and children series in a new column
 val maxDf = countDf
   .withColumn("maxCol 18+", greatest(structCols18: _*)
   .getItem("k"))
