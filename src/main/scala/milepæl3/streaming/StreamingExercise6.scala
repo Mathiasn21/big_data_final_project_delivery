@@ -7,7 +7,7 @@ import org.apache.spark.sql.streaming.{OutputMode, Trigger}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 
-object StreamingExample4{
+object StreamingExercise6{
   def main(args:Array[String]):Unit= {
     Logger.getLogger("org").setLevel(Level.ERROR)
     Logger.getLogger("akka").setLevel(Level.ERROR)

@@ -11,7 +11,7 @@ import org.apache.spark.sql.types._
 import scala.reflect.internal.util.TableDef.Column
 //Credentials(Uname, password, topic)
 
-object StreamingExample2{
+object StreamingExercise4{
   def main(args:Array[String]):Unit= {
     Logger.getLogger("org").setLevel(Level.WARN)
     Logger.getLogger("akka").setLevel(Level.WARN)
