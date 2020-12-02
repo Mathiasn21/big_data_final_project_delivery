@@ -31,7 +31,7 @@ object cmu_dict{
     val df1 = df.na.fill("")
     val dictDf = df1.withColumn("fonet", concat_ws(" ", col("_c1"), col("_c2"), col("_c3"))).drop("_c1", "_c2", "_c3")
 
-    mapped = dictDf.map(r => (r.getAs[String](0), r.getAs[String](1))).collect.toMap
+    mapped = dictDf.map(row => (row.getAs[String](0), row.getAs[String](1))).collect.toMap
 
     val streamIn = spark.readStream
       .format("kafka")
@@ -50,7 +50,6 @@ object cmu_dict{
       .withColumn("CMUdict", myFunction(array_join(split($"title", "[,\\.\"\'\\?\\@\\s]"), ",")))
       .select($"timestamp", $"author", $"title", $"date", $"CMUdict")
 
-    //[!._,'’@?“”"//\$\(\)\|\:-\s]
     val query = filteredDF.writeStream
       .format("console")
       .option("truncate", value = false).start()

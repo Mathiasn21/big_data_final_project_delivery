@@ -66,17 +66,17 @@ object hdfs{
             i
         }
 
-        var maxValIndex = (arr: Array[Double]) => {
+        val maxValIndex = (arr: Array[Double]) => {
             var max = 0.0
             var maxIndex = -1
             for (i <- arr.indices) {
                 val d = arr(i)
-                if(max < d){
+                if (max < d) {
                     max = d
                     maxIndex = i
                 }
             }
-            maxIndex = if(maxIndex == -1) maxIndex else maxIndex + crimeFirst
+            maxIndex = if (maxIndex == -1) maxIndex else maxIndex + crimeFirst
             (max, map(maxIndex))
         }
 

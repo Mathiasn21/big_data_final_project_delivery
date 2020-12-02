@@ -17,6 +17,8 @@ object interval_multiplied{
       .getOrCreate()
 
     import spark.implicits._
+
+    //Reads stream from kafka
     val streamIn = spark.readStream
       .format("kafka")
       .option("kafka.security.protocol", "SASL_SSL")
@@ -27,10 +29,12 @@ object interval_multiplied{
       .option("startingOffsets", "earliest")
       .load()
 
+    //sets watermark with a delay threshold of 1 second
     val waterMarked = streamIn
       .withColumn("timestamp", unix_timestamp(streamIn("timestamp"), "yyyy-MM-dd HH:mm:ss").cast("timestamp"))
       .withWatermark("timestamp", "1 second")
 
+    //
     val formattedDF = waterMarked
       .select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))
       .select("timestamp", "data.*")
