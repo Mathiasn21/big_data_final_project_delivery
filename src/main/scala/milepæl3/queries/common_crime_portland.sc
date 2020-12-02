@@ -29,7 +29,7 @@ val splitFile = file.map(line => {
   line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", head.length)
 })
 
-
+//Maps indexes to corresponding headers -> Used later to find corresponding header name for query
 var map = mutable.HashMap[Int, String](-1 -> "")
 for (i <- head.indices) {
   map += (i -> head(i))
@@ -37,7 +37,7 @@ for (i <- head.indices) {
 
 val filtered = splitFile.filter(arr => arr(indexOfCity).contains("Portland"))
 
-//Function that converts an array of Strings to Double
+//Converts array of Strings to array of Double
 val convertToDouble = (arr: Array[String]) => {
   val convertedArr = ListBuffer[Double]()
   for (i <- crimeFirst to crimeLast) {
