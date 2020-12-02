@@ -22,7 +22,6 @@ val spark = SparkSession.builder
 /*
 How many black and white people committed suicide with firearms and how many overdosed from drugs each year?
  */
-
 def loadDf(file: String): DataFrame = (spark.read format "csv")
   .option("header", "true")
   .option("inferSchema", "true")

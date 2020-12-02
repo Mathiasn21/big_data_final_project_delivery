@@ -1,3 +1,5 @@
+package milepæl2
+
 import scala.collection.immutable.HashMap
 
 object Files extends Enumeration {

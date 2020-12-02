@@ -14,10 +14,7 @@ val spark = SparkSession.builder
   .getOrCreate()
 print("\n\n\n")
 
-/*
-Reads the tv-show file and drops unnecessary columns.
-Then it groups by year, counts and re-names the count column
- */
+//Read tv-show file and drop unnecessary columns.
 val tvDf = spark.read.format("csv")
   .option("header", value = true)
   .option("inferSchema", "true")
@@ -27,7 +24,7 @@ val tvDf = spark.read.format("csv")
   .groupBy("Year")
   .count().withColumnRenamed("count", "tv_count")
 
-//Reads the kickstarter file and drops unnecessary columns
+//Read kickstarter file and drop unnecessary columns
 val kickDf = spark.read.format("csv")
   .option("header", value = true)
   .option("inferSchema", "true")
@@ -36,9 +33,9 @@ val kickDf = spark.read.format("csv")
     "goal ", "deadline ", "pledged ", "state ", "country ", "usd pledged ",
     "_c14", "_c15", "_c16", "_c13")
 /*
-Adds column "date_time" to kickDf and Converts the "Launched" column to a timestamp.
-Then adds a new column "Year_kick" with the extracted year from "date_time".
-Then groups by "Year_kick" and counts
+Add column "date_time" to kickDf and cast column "Launched" to timestamp.
+Extrapolate year from "date_time" column
+Group by year and count occurrences
  */
  val dateKick = kickDf.withColumn("date_time",
     unix_timestamp(kickDf("launched "), "yyyy-MM-dd HH:mm:ss").cast("timestamp"))
@@ -46,10 +43,9 @@ Then groups by "Year_kick" and counts
    .groupBy("Year_kick")
    .count().withColumnRenamed("count", "kickstarter_count")
 
-//tvDf and kickDf joined in a new dataframe
+//Join the dataframes on year and drop redundant column.
 val kickTv = tvDf.join(dateKick, tvDf.col("Year")
   .equalTo(dateKick("Year_kick"))).drop("Year_kick")
 
-//kickTv.show()
 kickTv.write.mode(SaveMode.Overwrite).format("csv").save("D:\\data\\testing")
 kickTv.explain(true)

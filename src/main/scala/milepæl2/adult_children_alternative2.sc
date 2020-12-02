@@ -52,18 +52,15 @@ val df_max = List(
 
 df_max.show()
 
-/*Choose series that are for children and adults,
-  then sort descending by count and pick the first element
- */
+//Filter series for children and adults, then count each respectively
 val max_all= df_max.filter($"show".like("%all%")).sort(col("count").desc).limit(1)
 val max_18 = df_max.filter($"show".like("%18%")).sort(col("count").desc).limit(1)
 
 /*
-  Combine the two dataframes to one dataframe with union,
-  then write that dataframe to disk
+  Union the two dataframes to combine information,
+  then write to disk
  */
 var newDf = spark.createDataFrame(sc.emptyRDD[Row], max_all.schema)
 val first_row = newDf.unionAll(max_all.select($"*"))
 val finalDf = first_row.unionAll(max_18.select("*"))
-//finalDf.show()
 finalDf.write.mode(SaveMode.Overwrite).format("csv").save("/home/student/Documents/prosjekt1/data")
