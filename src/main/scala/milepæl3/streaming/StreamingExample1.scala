@@ -4,7 +4,7 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.{from_json, lower, struct, to_json}
 import org.apache.spark.sql.types._
 
-object ContainsTrumpBiden{
+object StreamingExample1{
   def main(args:Array[String]):Unit= {
     Logger.getLogger("org").setLevel(Level.WARN)
     Logger.getLogger("akka").setLevel(Level.WARN)
