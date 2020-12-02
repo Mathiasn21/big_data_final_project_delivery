@@ -27,6 +27,7 @@ object StreamingEx6{
       .option("startingOffsets", "earliest")
       .load()
 
+    //Watermark the stream and cast timestamp to type timestamp
     val waterMarked = streamIn
       .withColumn("timestamp", unix_timestamp(streamIn("timestamp"), "yyyy-MM-dd HH:mm:ss").cast("timestamp"))
       .withWatermark("timestamp", "1 second")
@@ -38,6 +39,7 @@ object StreamingEx6{
     val trumpFilteredDf = formattedDF
       .filter(lower($"author").contains("trump") || lower($"content").contains("trump"))
 
+    //Group by and count number of occurrences inside the determined time interval
     val myWindow = window($"timestamp", "60 seconds", "60 seconds")
     val trumpWindowed = trumpFilteredDf.groupBy(myWindow).count()
 
@@ -46,11 +48,13 @@ object StreamingEx6{
     val staticWindow = Window.orderBy($"window")
 
     //Utilizes a custom function for handling each batch and therein each row
+    //Utilized a memory sink as it does not really matter if data is lost in memory in this query.
     val query = trumpWindowed.writeStream
       .format("memory")
       .option("truncate", value = false)
       .option("checkpointLocation", "D:\\projects_git\\Semester5\\big_data\\test")
       .foreachBatch { (df: DataFrame, _: Long) => {
+        //Use lag to remember previous values by 1 offset
         val newDf = df.withColumn("prev_count", lag($"count", 1, 0).over(staticWindow))
         newDf.foreach((row:Row) => {
           val count = row.getLong(1)
@@ -60,11 +64,14 @@ object StreamingEx6{
           if (lastTime != null && prev == 0 && (windowStruct.equals(lastTime) || windowStruct.getTimestamp(1).equals(lastTime.getTimestamp(0)))){
             prev = lastIntervalCount
           }
+          //Assumed it was greater than or equal, as also accounts for greater rates of trump articles.
+          //Which would make more sense from a business perspective
           if (count >= prev * 2) {
             print("Seeing a doubling of Trump!" + "\n")
             print( "Prev value: " + prev + " Current value: " + count + "\n\n\n")
           }
         })
+        //Reverse sort, such that max value, last entry becomes first entry.
         val maxTime = newDf.sort($"window.end".desc).limit(1)
         val firstVal = maxTime.first()
         lastIntervalCount = firstVal.getLong(1)
