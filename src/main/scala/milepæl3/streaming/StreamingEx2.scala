@@ -31,7 +31,6 @@ object StreamingEx2{
       .select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))
       .select("timestamp", "data.*")
 
-    
     formattedDf
       .writeStream
       .format("console")
