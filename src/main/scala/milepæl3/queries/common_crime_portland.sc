@@ -59,7 +59,7 @@ val convertToInt = (str: String) => {
   }
   i
 }
-//Determine max value as corresponding category
+//Determine max value and its corresponding category
 var maxValIndex = (arr: Array[Double]) => {
   var max = 0.0
   var maxIndex = -1
