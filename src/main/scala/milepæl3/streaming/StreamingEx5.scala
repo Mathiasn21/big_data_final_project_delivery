@@ -50,7 +50,6 @@ object StreamingEx5{
       .withColumn("CMUdict", myFunction(array_join(split($"title", "[,\\.\"\'\\?\\@\\s]"), ",")))
       .select($"timestamp", $"author", $"title", $"date", $"CMUdict")
 
-    //[!._,'’@?“”"//\$\(\)\|\:-\s]
     val query = filteredDF.writeStream
       .format("console")
       .option("truncate", value = false).start()
