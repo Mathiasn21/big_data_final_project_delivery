@@ -53,10 +53,7 @@ object StreamingExercise4{
       .withColumn("words", extractAll(lower($"title"), lit("(clinton|biden|trump)")))
       .filter($"words".notEqual(""))
       .withColumn("words", explode(split($"words", ",")))
-      //.groupBy("retrieved","title", "words").count()
 
-
-    // countedDf.withColumn("newCol", myFunction(split($"title", "[!._,'’@?“”\"//\\$\\(\\)\\|\\:-\\s]")))
     val myWindow = window($"retrieved", "45 seconds", "45 seconds")
     val windowed = countedDf.groupBy(myWindow, $"words").count()
 
