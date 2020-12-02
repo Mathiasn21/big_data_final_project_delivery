@@ -9,6 +9,9 @@ val spark = SparkSession.builder
   .appName("Testing App")
   .getOrCreate()
 
+
+//Which city had the highest crime rate per capita?
+
 val sc = spark.sparkContext
 val filePath = "D:\\data\\crime_in_context_19752015.csv"
 
@@ -21,8 +24,6 @@ val splitFile = file.map(line => {
   line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", head.length)
 })
 splitFile.collect().foreach ( x => println(x.mkString(", ")))
-
-//Which city had the highest crime rate per capita?
 
 //Function that converts String to Double
 val convertToDouble = (str: String) => {

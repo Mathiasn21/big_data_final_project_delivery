@@ -37,6 +37,7 @@ for (i <- head.indices) {
 
 val filtered = splitFile.filter(arr => arr(indexOfCity).contains("Portland"))
 
+//Function that converts an array of Strings to Double
 val convertToDouble = (arr: Array[String]) => {
   val convertedArr = ListBuffer[Double]()
   for (i <- crimeFirst to crimeLast) {
@@ -50,6 +51,7 @@ val convertToDouble = (arr: Array[String]) => {
   convertedArr.toArray
 }
 
+//Converts string to Int
 val convertToInt = (str: String) => {
   var i = 0
   if (!(str == null) && !str.isBlank) {
@@ -72,7 +74,7 @@ var maxValIndex = (arr: Array[Double]) => {
   (max, map(maxIndex))
 }
 
-//Find most common crime in portland.
+//Finds most common crime in portland.
 val summedRDD = filtered.map(
   arr => (
     convertToInt(arr(yearIndex)),
