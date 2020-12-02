@@ -7,7 +7,7 @@ import org.apache.spark.sql.streaming.{OutputMode, Trigger}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 
-object StreamingEx6{
+object interval_multiplied{
   def main(args:Array[String]):Unit= {
     Logger.getLogger("org").setLevel(Level.ERROR)
     Logger.getLogger("akka").setLevel(Level.ERROR)
@@ -47,8 +47,8 @@ object StreamingEx6{
     var lastTime:Row = null
     val staticWindow = Window.orderBy($"window")
 
-    //Utilizes a custom function for handling each batch and therein each row
-    //Utilized a memory sink as it does not really matter if data is lost in memory in this query.
+    /*Utilizes a custom function for handling each batch and therein each row
+    Utilized a memory sink as it does not really matter if data is lost in memory in this query.*/
     val query = trumpWindowed.writeStream
       .format("memory")
       .option("truncate", value = false)
