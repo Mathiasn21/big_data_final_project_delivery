@@ -1,9 +1,6 @@
-import java.time.Year
-
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.{Column, DataFrame, Row, SaveMode, SparkSession}
-import org.apache.spark.sql.functions.{col, sum}
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.{col, _}
+import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 
 
 Logger.getLogger("org").setLevel(Level.WARN)

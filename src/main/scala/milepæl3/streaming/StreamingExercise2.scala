@@ -2,7 +2,7 @@ package milepæl3.streaming
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.{from_json, lower, map_values, struct, to_json}
+import org.apache.spark.sql.functions.from_json
 import org.apache.spark.sql.types._
 //Credentials(Uname, password, topic)
 

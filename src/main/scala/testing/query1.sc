@@ -1,7 +1,6 @@
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.catalyst.dsl.expressions.{DslExpression, StringToAttributeConversionHelper}
-import org.apache.spark.sql.functions.{col, regexp_extract, regexp_replace, when}
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.apache.spark.sql.functions.regexp_extract
+import org.apache.spark.sql.{SaveMode, SparkSession}
 
 Logger.getLogger("org").setLevel(Level.WARN)
 Logger.getLogger("akka").setLevel(Level.WARN)

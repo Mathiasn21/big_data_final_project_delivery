@@ -7,8 +7,6 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.{OutputMode, Trigger}
 import org.apache.spark.sql.types._
-
-import scala.reflect.internal.util.TableDef.Column
 //Credentials(Uname, password, topic)
 
 object StreamingExercise4{

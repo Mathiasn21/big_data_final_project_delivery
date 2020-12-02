@@ -1,8 +1,7 @@
 package milepæl3.hdfs
 
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.types.{ArrayType, StringType, StructType}
-import org.apache.spark.sql.{Row, SparkSession}
+import org.apache.spark.sql.SparkSession
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -18,8 +17,6 @@ object hdfs{
           .master("local[*]")
           .appName("HDFS")
           .getOrCreate()
-
-        import spark.implicits._
 
         val sc = spark.sparkContext
 
