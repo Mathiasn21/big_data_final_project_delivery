@@ -23,7 +23,10 @@ var file = sc.textFile(filePath)
 val headers = file.first()
 val head = headers.split(",")
 
+//Handle headers
 file = file.filter(line => line != headers && !line.contains("United States"))
+
+//Manually split each line into columns, returns RDD[Array[String]]
 val splitFile = file.map(line => {
   line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", head.length)
 })

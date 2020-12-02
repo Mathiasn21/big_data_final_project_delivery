@@ -40,7 +40,7 @@ val keyValueRDD = splitFile.map(arr => (arr(2), convertToDouble(arr(10))))
 val reducedRDD = keyValueRDD.reduceByKey ((a, b) => a + b)
 print(reducedRDD.collect().mkString("Array(", ", ", ")"))
 
-//Function that sorts reducedRDD and then picks the max value
+//Execute custom sorting from high to low and select max key
 val maxKey2 = reducedRDD.max()(new Ordering[(String, Double)]() {
   override def compare(x: (String, Double), y: (String, Double)): Int =
     Ordering[Double].compare(x._2, y._2)
