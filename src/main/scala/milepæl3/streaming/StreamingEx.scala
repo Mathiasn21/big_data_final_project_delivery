@@ -6,7 +6,7 @@ import org.apache.spark.sql.functions.{from_json, lower, map_values, struct, to_
 import org.apache.spark.sql.types._
 //Credentials(Uname, password, topic)
 
-object StreamingEx2{
+object StreamingEx{
   def main(args:Array[String]):Unit= {
     Logger.getLogger("org").setLevel(Level.WARN)
     Logger.getLogger("akka").setLevel(Level.WARN)

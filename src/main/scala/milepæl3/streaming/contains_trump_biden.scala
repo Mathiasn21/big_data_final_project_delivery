@@ -24,6 +24,7 @@ object contains_trump_biden{
       .option("startingOffsets", "earliest")
       .load()
 
+    //Watermark the stream and cast timestamp to type timestamp
     val waterMarked = streamIn.withWatermark("timestamp", "1 second")
     val formattedDF = waterMarked
       .select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))

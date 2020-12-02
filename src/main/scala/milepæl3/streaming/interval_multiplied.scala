@@ -64,8 +64,8 @@ object interval_multiplied{
           if (lastTime != null && prev == 0 && (windowStruct.equals(lastTime) || windowStruct.getTimestamp(1).equals(lastTime.getTimestamp(0)))){
             prev = lastIntervalCount
           }
-          //Assumed it was greater than or equal, as also accounts for greater rates of trump articles.
-          //Which would make more sense from a business perspective
+          /*Assumed it was greater than or equal, as also accounts for greater rates of trump articles.
+          Which would make more sense from a business perspective*/
           if (count >= prev * 2) {
             print("Seeing a doubling of Trump!" + "\n")
             print( "Prev value: " + prev + " Current value: " + count + "\n\n\n")
