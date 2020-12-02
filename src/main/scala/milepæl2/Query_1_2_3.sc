@@ -26,24 +26,18 @@ var df = spark.read.format(format)
 
 df.describe().show()
 
-/*
-   What is the average number tv-shows released pr year?
- */
+//What is the average number tv-shows released pr year?
 def query_1(df: DataFrame): Unit = {
-  //groups by year, counts tv shows for each year, then calculates the average
+  //Count tv shows per year, then calculate the average and write to file
   df.groupBy("Year")
     .count()
     .agg(avg("count").as("Avg_year"))
-    //.show()
     .write.mode(SaveMode.Overwrite).format("csv").save("D:\\data\\testing")
 }
 
-/*
-    Which streaming service has the most and least tv-series available?
- */
-
+//Which streaming service has the most and least tv-series available?
 def query_2(df : DataFrame): Unit = {
-  //aggregates the sum of the streaming service columns
+  //Sum tv shows related to each streaming service
   val summedDf = df.agg(
     sum("Hulu").as("Hulu_sum"),
     sum("Disney+").as("Disney_sum"),
@@ -59,25 +53,23 @@ def query_2(df : DataFrame): Unit = {
     .withColumn("minCol", least(structs: _*).getItem("k")).show()
 }
 
-/*
-    What year released the shows with highest rating?
- */
 
+//What year released the shows with highest rating?
 def query_3(df: DataFrame): Unit = {
-  //groups IMDb by year and calculates the sum of ratings, sorts then picks the first value
+  //group IMDb by year and calculate sum of all ratings, sort descending and get first value = max value
   val res = df.filter("IMDb is not null").groupBy("Year")
     .sum("IMDb").sort(column("sum(IMDb)").desc).limit(1)
     res.show()
   res.write.mode(SaveMode.Overwrite).format("csv").save("D:\\data\\testing")
 }
 
-/*def query_3(df: DataFrame): Unit = {
-  //TODO: Find year has the highest rating shows pr year - Alternative
-  print("\n\n\nQuery for flest shows med høyest rating")
+//Using aggregation instead
+def query_3_alternative(df: DataFrame): Unit = {
   df.filter("IMDb is not null").groupBy("Year")
     .agg(sum("IMDb").as("rating_sum")).agg(max(column("rating_sum"))).explain(true)
-}*/
+}
 
 query_1(df)
 query_2(df)
 query_3(df)
+query_3_alternative(df)

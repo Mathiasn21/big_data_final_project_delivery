@@ -1,7 +1,7 @@
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.functions.{col, column}
 import org.apache.spark.sql.{SaveMode, SparkSession}
-
+import milepæl2.{DataFiles, Files}
 
 
 Logger.getLogger("org").setLevel(Level.WARN)
@@ -17,7 +17,6 @@ val file = Files.TvShows
 val path = DataFiles.getFilePath(file)
 val format = DataFiles.getFileType(file)
 
-//VIKTIGSTE :')
 var df = spark.read.format(format)
   .option("delimiter", ",")
   .option("header", value = true)
@@ -27,6 +26,7 @@ var df = spark.read.format(format)
 
 df.write.mode(SaveMode.Overwrite).format("csv").save("D:\\data\\testing")
 print(df.columns.mkString(", "))
+
 df.where(col("Year") > 2010).sort(column("IMDb").desc_nulls_last).show(1000, truncate = false)
 df.select("Age").distinct().show()
 
