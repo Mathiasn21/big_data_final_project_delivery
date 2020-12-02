@@ -49,7 +49,7 @@ val df_max = List(
 
 df_max.show()
 
-//Filter series for children and adults, then count each respectively
+//Filter series for children and adults, then sort each respectively and picks first value
 val max_all= df_max.filter($"show".like("%all%")).sort(col("count").desc).limit(1)
 val max_18 = df_max.filter($"show".like("%18%")).sort(col("count").desc).limit(1)
 

@@ -34,6 +34,7 @@ object StreamingExercise4{
       .select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))
       .select("timestamp", "data.*")
 
+    //Watermark the stream and cast timestamp to type timestamp. With threshold of 2 hours.
     val waterMarked = formattedDF
       .withColumn("retrieved", unix_timestamp(formattedDF("retrieved"), "yyyy-MM-dd HH:mm:ss.SSSSSS").cast("timestamp"))
       .withWatermark("retrieved", "120 seconds")
@@ -47,6 +48,7 @@ object StreamingExercise4{
         lower($"content").contains("biden")
     )
 
+    //extracts all title containing Trump, Biden or Clinton
     val countedDf = filteredDf
       .withColumn("words", extractAll(lower($"title"), lit("(clinton|biden|trump)")))
       .filter($"words".notEqual(""))
