@@ -25,12 +25,17 @@ object cmu_dict{
         StructField("_c2", StringType, nullable=false) ::
         StructField("_c3", StringType, nullable=false) :: Nil
     )
+    //Utilizes a custom hdfs that was setup locally on a home server
     val path = "hdfs://10.0.0.95:9000/cmudict.dict"
+
+    //Using a map to set options is sort off redundant as it only has one option though useful to note that possibility
     val df = spark.read.schema(schema).options(Map("delimiter"->" ")).csv(path)
 
+    //Fill missing data with empty strings. Concat to fonet column and drop the rest.
     val df1 = df.na.fill("")
     val dictDf = df1.withColumn("fonet", concat_ws(" ", col("_c1"), col("_c2"), col("_c3"))).drop("_c1", "_c2", "_c3")
 
+    //Map word to fonet -> Makes it faster to access the correct fonet
     mapped = dictDf.map(row => (row.getAs[String](0), row.getAs[String](1))).collect.toMap
 
     val streamIn = spark.readStream
@@ -46,8 +51,10 @@ object cmu_dict{
     val waterMarked = streamIn.withWatermark("timestamp", "1 second")
     val formattedDF = waterMarked.select($"timestamp", from_json($"value".cast("string"), getSchema).alias("data"))
       .select("timestamp", "data.*")
+
+    //Map fonets to title and remove certain characters
     val filteredDF = formattedDF
-      .withColumn("CMUdict", myFunction(array_join(split($"title", "[,\\.\"\'\\?\\@\\s]"), ",")))
+      .withColumn("CMUdict", mapFonetToWords(array_join(split($"title", "[,\\.\"\'\\?\\@\\s]"), ",")))
       .select($"timestamp", $"author", $"title", $"date", $"CMUdict")
 
     val query = filteredDF.writeStream
@@ -56,19 +63,19 @@ object cmu_dict{
     query.awaitTermination()
   }
 
-  private def myFunction = udf((str: String) => {
-    var thing = Seq[String]()
+  private def mapFonetToWords = udf((str: String) => {
+    var fonets = Seq[String]()
     str.split(",").foreach((word:String) => {
       try {
         val v = mapped(word.toLowerCase)
-        thing = thing :+ v
+        fonets = fonets :+ v
       } catch {
         case e: Exception =>
           print("Word not found :( " + word, "\n\n\n\n", e)
-          thing = thing :+ word
+          fonets = fonets :+ word
       }
     })
-    thing.mkString(" ")
+    fonets.mkString(" ")
   })
 
   private def getSchema:StructType={
