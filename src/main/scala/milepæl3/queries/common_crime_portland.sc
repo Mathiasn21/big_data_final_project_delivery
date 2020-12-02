@@ -74,7 +74,7 @@ var maxValIndex = (arr: Array[Double]) => {
   (max, map(maxIndex))
 }
 
-//Finds most common crime in portland.
+//Finds most common crime in portland by category and max value
 val summedRDD = filtered.map(
   arr => (
     convertToInt(arr(yearIndex)),
