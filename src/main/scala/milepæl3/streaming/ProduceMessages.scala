@@ -7,8 +7,8 @@ import org.apache.kafka.common.utils.Utils.sleep
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.{col, from_json, udf}
-import org.apache.spark.sql.streaming.{OutputMode, Trigger}
-import org.apache.spark.sql.types.{DoubleType, IntegerType, StringType, StructType}
+import org.apache.spark.sql.streaming.Trigger
+import org.apache.spark.sql.types.{DoubleType, StringType, StructType}
 import org.json4s._
 import org.json4s.jackson.Json
 
@@ -29,7 +29,7 @@ object ProduceMessages {
   def main(args: Array[String]): Unit = {
     Logger.getLogger("org").setLevel(Level.WARN)
     Logger.getLogger("akka").setLevel(Level.WARN)
-    val path = "D:\\data\\all_the_news"
+    val path = "D:\\data\\all_the_news2"
 
     val spark = SparkSession.builder()
       .master("local[*]")
@@ -42,9 +42,9 @@ object ProduceMessages {
 
     val preparedStream = streamIn
       //First parse raw text from badly formatted csv file into json using a udf
-      .withColumn("value", parseTextToJson(streamIn("value")))
+      .withColumn("value", parseTextToJson(streamIn("value")).cast(StringType))
 
-      //Then extract id by converting it from json and grabbing the id, which is then cast to key as required by cloudkarafka
+      //Then extract id by converting it from json and grabbing the id, which is then cast to String as type is required by cloudkarafka
       .withColumn("key", from_json(col("value"), schema).getItem("id").cast(StringType))
 
     //And finally setup config for streaming to kafka
@@ -55,8 +55,10 @@ object ProduceMessages {
       .option("kafka.sasl.mechanism", "SCRAM-SHA-256")
       .option("kafka.sasl.jaas.config", """org.apache.kafka.common.security.scram.ScramLoginModule required username="aneqi8m2" password="tiYqB_68T6l8OZU30p22LqTrXAsfEmCJ";""")
       .option("kafka.bootstrap.servers", "rocket-01.srvs.cloudkafka.com:9094,rocket-02.srvs.cloudkafka.com:9094,rocket-03.srvs.cloudkafka.com:9094")
-      .option("topic", "aneqi8m2-news")
+      .option("topic", "aneqi8m2-test")
       .option("checkpointLocation", "D:\\projects_git\\Semester5\\big_data\\test")
+      .option("maxOffsetsPerTrigger", 20)
+      .trigger(Trigger.ProcessingTime("3 seconds"))
       .start().awaitTermination()
   }
 
@@ -80,6 +82,7 @@ object ProduceMessages {
     if (matcher.find()) {
       try {
         val random = new scala.util.Random
+        //Generate a random time difference as is done in the python script
         val timeRetrieved = LocalDateTime.now().minusSeconds(random.nextInt(3600)).toString
 
         val id = matcher.group("id")
@@ -103,8 +106,12 @@ object ProduceMessages {
           "content" -> content,
           "retrieved" -> timeRetrieved
         )
+        println("Writing data to cloud karafka.")
+
         //Convert content to json format
         res = Json(DefaultFormats).write(data)
+        println(res)
+
       } catch {
         case _: Exception => print("Unparsable: ", str)
       }
