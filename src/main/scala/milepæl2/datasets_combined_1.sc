@@ -14,6 +14,7 @@ val spark = SparkSession.builder
 print("\n\n\n")
 
 //Read tv-show file and drop unnecessary columns.
+// Then groups by year, counts and re-names the count column
 val tvDf = spark.read.format("csv")
   .option("header", value = true)
   .option("inferSchema", "true")
