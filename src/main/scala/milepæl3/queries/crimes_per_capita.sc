@@ -25,7 +25,7 @@ val splitFile = file.map(line => {
 })
 splitFile.collect().foreach ( x => println(x.mkString(", ")))
 
-//Function that converts String to Double
+//Converts String to Double
 val convertToDouble = (str: String) => {
   var i = 0.0
   if (!(str == null) && !str.isBlank) {
@@ -38,6 +38,7 @@ val convertToDouble = (str: String) => {
 val keyValueRDD = splitFile.map(arr => (arr(2), convertToDouble(arr(10))))
 //combines values with the same key
 val reducedRDD = keyValueRDD.reduceByKey ((a, b) => a + b)
+print(reducedRDD.collect().mkString("Array(", ", ", ")"))
 
 //Function that sorts reducedRDD and then picks the max value
 val maxKey2 = reducedRDD.max()(new Ordering[(String, Double)]() {
