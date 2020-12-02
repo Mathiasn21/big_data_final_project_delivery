@@ -1,11 +1,6 @@
-import org.apache.commons.collections.CollectionUtils.select
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql
-import org.apache.spark.sql.functions.{col, column}
+import org.apache.spark.sql.functions.{col, _}
 import org.apache.spark.sql.{SaveMode, SparkSession}
-import org.apache.spark.sql.functions.{col, sum}
-import org.apache.spark.sql.functions._
 
 Logger.getLogger("org").setLevel(Level.WARN)
 Logger.getLogger("akka").setLevel(Level.WARN)

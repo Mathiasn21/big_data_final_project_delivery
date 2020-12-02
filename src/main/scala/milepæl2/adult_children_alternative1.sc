@@ -1,7 +1,6 @@
 import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.functions.{col, _}
 import org.apache.spark.sql.{Column, SaveMode, SparkSession}
-import org.apache.spark.sql.functions.col
-import org.apache.spark.sql.functions._
 
 Logger.getLogger("org").setLevel(Level.WARN)
 Logger.getLogger("akka").setLevel(Level.WARN)

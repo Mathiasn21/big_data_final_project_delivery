@@ -3,7 +3,6 @@ package milepæl3.streaming
 import java.time.LocalDateTime
 import java.util.regex.Pattern
 
-import org.apache.kafka.common.utils.Utils.sleep
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.{col, from_json, udf}

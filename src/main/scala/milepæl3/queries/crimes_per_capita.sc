@@ -1,8 +1,4 @@
-import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.{Column, SaveMode, SparkSession}
-
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import org.apache.spark.sql.SparkSession
 
 val spark = SparkSession.builder
   .master("local[*]")
