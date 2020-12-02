@@ -29,6 +29,7 @@ object hdfs{
         val head = headers.split(",")
         file = file.filter(line => line != headers && !line.contains("United States"))
 
+        //Get important indexes
         val indexOfCity = head.indexWhere(str => str.equals("agency_jurisdiction"))
         val crimeFirst = head.indexWhere(str => str.equals("homicides_percapita"))
         val crimeLast = head.indexWhere(str => str.equals("robberies_percapita"))
@@ -38,6 +39,7 @@ object hdfs{
             line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", head.length)
         })
 
+        //Maps indexes to corresponding headers -> Used later to find corresponding header name for query
         var map = mutable.HashMap[Int, String](-1 -> "")
         for (i <- head.indices) {
             map += (i -> head(i))
@@ -45,6 +47,7 @@ object hdfs{
 
         val filtered = splitFile.filter(arr => arr(indexOfCity).contains("Portland"))
 
+        //Converts array of Strings to array of Double
         val convertToDouble = (arr: Array[String]) => {
             val convertedArr = ListBuffer[Double]()
             for (i <- crimeFirst to crimeLast) {
@@ -58,6 +61,7 @@ object hdfs{
             convertedArr.toArray
         }
 
+        //Converts string to Int
         val convertToInt = (str: String) => {
             var i = 0
             if (!(str == null) && !str.isBlank) {
@@ -65,7 +69,7 @@ object hdfs{
             }
             i
         }
-
+        //Determine max value and its corresponding category
         val maxValIndex = (arr: Array[Double]) => {
             var max = 0.0
             var maxIndex = -1
@@ -80,7 +84,7 @@ object hdfs{
             (max, map(maxIndex))
         }
 
-        //Find most common crime in portland.
+        //Finds most common crime in portland by category and max value
         val summedRDD = filtered.map(
             arr => (
               convertToInt(arr(yearIndex)),

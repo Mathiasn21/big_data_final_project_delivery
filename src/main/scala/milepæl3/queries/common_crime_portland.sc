@@ -20,6 +20,7 @@ val headers = file.first()
 val head = headers.split(",")
 file = file.filter(line => line != headers && !line.contains("United States"))
 
+//Get important indexes
 val indexOfCity = head.indexWhere(str => str.equals("agency_jurisdiction"))
 val crimeFirst = head.indexWhere(str => str.equals("homicides_percapita"))
 val crimeLast = head.indexWhere(str => str.equals("robberies_percapita"))
