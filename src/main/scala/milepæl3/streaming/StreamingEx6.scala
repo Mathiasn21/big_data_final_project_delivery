@@ -45,6 +45,7 @@ object StreamingEx6{
     var lastTime:Row = null
     val staticWindow = Window.orderBy($"window")
 
+    //Utilizes a custom function for handling each batch and therein each row
     val query = trumpWindowed.writeStream
       .format("memory")
       .option("truncate", value = false)
@@ -55,6 +56,7 @@ object StreamingEx6{
           val count = row.getLong(1)
           val windowStruct = row.getStruct(0)
           var prev = row.getLong(2)
+          //Handle special case where query is first ran or entering a new batch.
           if (lastTime != null && prev == 0 && (windowStruct.equals(lastTime) || windowStruct.getTimestamp(1).equals(lastTime.getTimestamp(0)))){
             prev = lastIntervalCount
           }
