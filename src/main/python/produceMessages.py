@@ -41,7 +41,6 @@ if __name__ == '__main__':
 
     p = Producer(**conf)
 
-
     def delivery_callback(err, msg):
         if err:
             sys.stderr.write('%% Message failed delivery: %s\n' % err)
